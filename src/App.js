@@ -3,10 +3,10 @@ import "./App.css";
 
 function Chat() {
   const [msgText, setMsgText] = useState('Epic');
-
+  const [msg, setMsg] = useState('');
 
   const form = (
-        <textarea placeholder={"Type words"} autoFocus id="typeChat">
+        <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={"Type words"} autoFocus id="typeChat">
         </textarea>
     )
 
@@ -18,7 +18,8 @@ function Chat() {
 
   function chat(e) {
 
-      setMsgText(msgText + "!!");
+      setMsgText(msgText + msg);
+      setMsg('');
     e.preventDefault();
     // You got this Jack! You can do it! o/
   }
