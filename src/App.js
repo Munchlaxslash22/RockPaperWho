@@ -1,32 +1,54 @@
-function App() {
-return (
-<div className="App">
-        <center>
-            <div id="center">
-                test
-                <textarea readOnly id="chat">
-                    Lorem Ipsum fiddle faddle fipsum she strolli on my friholli until the gypsi dips em.
-                </textarea>
-                <form onSubmit={chat}>
-                <textarea placeholder={"Type words"} autoFocus id="typeChat">
-                </textarea>
-                    <button>
-                        Chat
-                    </button>
-                </form>
-            </div>
-        </center>
-</div>
-);
-}
+import {useState} from "react";
+import "./App.css";
 
-function chat(e) {
+function Chat() {
+  const [msgText, setMsgText] = useState('Epic');
+
+
+  const form = (
+        <textarea placeholder={"Type words"} autoFocus id="typeChat">
+        </textarea>
+    )
+
+  const TextChat = () => (
+      <textarea readOnly id="chat">
+        {msgText}
+      </textarea>
+  )
+
+  function chat(e) {
+
+      setMsgText(msgText + "!!");
     e.preventDefault();
     // You got this Jack! You can do it! o/
+  }
+
+  return (
+      <>
+        <TextChat />
+        <form onSubmit={chat}>
+        {form}
+          <button>
+            Chat
+          </button>
+        </form>
+          <p>{msgText}</p>
+      </>
+  )
 }
 
-function sendChat(string, self){
 
+function App() {
+  return (
+      <div className="App-header">
+        <center>
+          <div id="center">
+            test
+            <Chat />
+          </div>
+        </center>
+      </div>
+  );
 }
 
 export default App;
