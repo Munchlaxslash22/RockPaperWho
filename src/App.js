@@ -22,6 +22,7 @@ function Chat() {
       setMsg('');
     e.preventDefault();
     // You got this Jack! You can do it! o/
+      // Hey if you see this, I've pushed correctly :)
   }
 
   return (
