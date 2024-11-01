@@ -30,8 +30,7 @@ function Chat() {
         <TextChat />
         <form onSubmit={chat}>
         {form}
-          <button id={'chatButton'}>
-          </button>
+          <img src={'/Enter_Button.jpg'} />
         </form>
       </>
   )
