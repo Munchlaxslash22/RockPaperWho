@@ -2,7 +2,7 @@ import {useState} from "react";
 import "./App.css";
 
 function Chat() {
-  const [msgText, setMsgText] = useState('Epic');
+  const [msgText, setMsgText] = useState('');
   const [msg, setMsg] = useState('');
 
   const form = (
@@ -30,11 +30,9 @@ function Chat() {
         <TextChat />
         <form onSubmit={chat}>
         {form}
-          <button>
-            Chat
+          <button id={'chatButton'}>
           </button>
         </form>
-          <p>{msgText}</p>
       </>
   )
 }
@@ -45,7 +43,6 @@ function App() {
       <div className="App-header">
         <center>
           <div id="center">
-            test
             <Chat />
           </div>
         </center>
