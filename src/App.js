@@ -5,10 +5,6 @@ function Chat() {
   const [msgText, setMsgText] = useState('');
   const [msg, setMsg] = useState('');
 
-  const form = (
-        <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={"Type words"} autoFocus id="typeChat">
-        </textarea>
-    )
 
   const TextChat = () => (
       <textarea readOnly id="chat">
@@ -29,8 +25,8 @@ function Chat() {
       <>
         <TextChat />
         <form onSubmit={chat}>
-        {form}
-          <img src={'/Enter_Button.jpg'} id={"chatButton"} />
+        <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={"Type words"} autoFocus id="typeChat">
+        </textarea> <img src={'/Enter_Button.jpg'} id={"chatButton"}  alt={"Enter"}/>
         </form>
       </>
   )
