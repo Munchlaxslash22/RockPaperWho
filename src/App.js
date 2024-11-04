@@ -1,5 +1,6 @@
 import {useState} from "react";
 import "./App.css";
+import enterButtonImage from './.resources/Enter_Button.jpg';
 
 function Chat() {
   const [msgText, setMsgText] = useState('');
@@ -26,7 +27,7 @@ function Chat() {
         <TextChat />
         <form onSubmit={chat}>
         <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={"Type words"} autoFocus id="typeChat">
-        </textarea> <img src={'/Enter_Button.jpg'} id={"chatButton"}  alt={"Enter"}/>
+        </textarea> <img src={enterButtonImage} id={"chatButton"}  alt={"Enter"}/>
         </form>
       </>
   )
