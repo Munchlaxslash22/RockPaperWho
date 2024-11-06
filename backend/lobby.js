@@ -1,4 +1,4 @@
-class lobby{
+class Lobby{
     constructor() {
     this.host = null;
     this.playerList = [];
