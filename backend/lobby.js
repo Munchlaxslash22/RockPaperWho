@@ -1,7 +1,7 @@
 class Lobby{
     constructor() {
-    this.host = null;
-    this.playerList = [];
+        this.host = null;
+        this.playerList = [];
 
     }
 
