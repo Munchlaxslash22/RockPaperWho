@@ -3,7 +3,7 @@ class Game {
         this.redTeamPrompt = null;
         this.blueTeamPrompt = null;
         this.gameRound = 0;
-        this.gameEnd = false;         //This was an int in the diagram, but it makes more sense as a boolean
+        this.gameEnd = 0;         //This is the round that the game ends.
     }
 
     clearAllPrompts() {
