@@ -32,8 +32,16 @@ class Game {
 
     gameLoop(){
         // Prompt every individual in the collection of players for their "answer"
+        this.playerLobby.playerList.forEach(Player => {
+            // Prompt for responses
+            let recievedPrompt = ""; //somefunction
+            // Set responces
+            Player.prompt(recievedPrompt);
+        });
 
-        // Loop for each 2 pairs of players
+        // Loop for each pair
+        this.playerLobby.playerList.forEach(Player => {
+            
             // Show off each pair
 
             // Players access chat
@@ -42,6 +50,7 @@ class Game {
 
             // Loop until 1 player remains
 
+        })
         // Final player declared winner
 
         // Prompt for another round, if so restart game loop

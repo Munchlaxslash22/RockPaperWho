@@ -7,6 +7,7 @@ class Player {
         this.prompt = "";
         this.vote = null;
         this.isReady = false;
+        this.isOut = false;
     }
 
     constructor(name, playerID, isHost){
@@ -16,6 +17,7 @@ class Player {
         this.prompt = "";
         this.vote = null;
         this.isReady = false;
+        this.isOut = false;
     }
 
     set prompt(myPrompt){
@@ -24,6 +26,10 @@ class Player {
 
     set vote(myVote){
         this.vote = myVote;
+    }
+
+    set isOut(knockedOut){
+        this.isOut = knockedOut;
     }
 
     joinGame(roomId){
