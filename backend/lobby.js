@@ -7,6 +7,9 @@ class Lobby{
 
     //Enter players into the array
     setplayerIndex(player, index){
+        if(index > 8)
+            console.log("Not a valid index");
+
         this.playerList[index] = player;
     }
 
@@ -18,7 +21,12 @@ class Lobby{
     //starts the game (currently pseudocode)
     startGame(playerList, host) {
         //if isReady in playerlist is all true, promp host to start game
-        // else, not all players are ready
+    if(playerList.every(player.isReady = true)){
+        // start game
+    }
+    else
+    console.log("Players not all ready");
+    //integrate with front end
     }
 
 }
