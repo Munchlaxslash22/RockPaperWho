@@ -1,5 +1,3 @@
-// This will send whatever you type in to whoever sends a request
-
 const { Server } = require('socket.io');
 const io = new Server({
     cors: {
