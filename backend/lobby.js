@@ -1,8 +1,8 @@
 class Lobby{
-    constructor() {
+    constructor(roomCode) {
         this.host = null;
         this.playerList = [];
-
+        this.roomCode = roomCode;
     }
 
     //Enter players into the array

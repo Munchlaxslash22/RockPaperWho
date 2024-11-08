@@ -1,9 +1,15 @@
 class Game {
-    constructor() {
+    constructor(roomCode) {
+        this.playerLobby = new Lobby(roomCode);
         this.redTeamPrompt = null;
         this.blueTeamPrompt = null;
         this.gameRound = 0;
         this.gameEnd = 0;         //This is the round that the game ends.
+        this.pageIndex
+    }
+
+    set pageIndex(index) {
+
     }
 
     clearAllPrompts() {
@@ -22,4 +28,6 @@ class Game {
     goBackToLobby() {
 
     }
+
+    
 }
