@@ -1,6 +1,11 @@
 /* config-overrides.js */
 
 module.exports = {
+    webpack: function(config, env) {
+
+        return config;
+    },
+
     // Extend/override the dev server configuration used by CRA
     // See: https://github.com/timarney/react-app-rewired#extended-configuration-options
     devServer: function(configFunction) {

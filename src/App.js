@@ -18,7 +18,6 @@ function App() {
         }
     })
 
-
   return (
       <div className="App-header">
         <center>
@@ -42,6 +41,7 @@ function App() {
                       })
                   }
               </table>
+              <p>{process.env.REACT_APP_SERVER_URL}</p>
           </div>
         </center>
       </div>
