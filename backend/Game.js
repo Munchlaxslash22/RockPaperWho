@@ -29,5 +29,21 @@ class Game {
 
     }
 
-    
+    gameLoop(){
+        // Prompt every individual in the collection of players for their "answer"
+
+        // Loop for each 2 pairs of players
+            // Show off each pair
+
+            // Players access chat
+
+            // Players vote who wins
+
+            // Loop until 1 player remains
+
+        // Final player declared winner
+
+        // Prompt for another round, if so restart game loop
+        
+    }
 }
