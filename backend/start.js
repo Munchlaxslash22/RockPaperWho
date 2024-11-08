@@ -1,16 +1,13 @@
 // This will send whatever you type in to whoever sends a request
 
-const {createServer} = require('http');
 const { Server } = require('socket.io');
-
-const players = [];
-
-const server = createServer();
-const io = new Server(server, {
+const io = new Server({
     cors: {
         origin: '*',
     }
 });
+
+const players = [];
 
 io.on('connection', (socket) => {
     socket.on('setup', (name) => {
@@ -19,15 +16,19 @@ io.on('connection', (socket) => {
             name: name,
             socket: socket,
         });
-        socket.emit('setup', players.map(p => {return {name: p.name}}))
+        io.emit('setup', players.map(p => {return {name: p.name}}))
     })
 
-    console.log("connected !!!");
+    socket.on('disconnect', () => {
+        console.log('Lost connection to ' + socket.conn.remoteAddress);
+    })
+
+    console.log('New connection from ' + socket.conn.remoteAddress);
 })
 
-// when code is exitted out, program ends, ctrl + c
+// when code is exited out, program ends, ctrl + c
 process.on('exit', () => {
     io.close();
 })
 
-server.listen(8888);
+io.listen(8888);
