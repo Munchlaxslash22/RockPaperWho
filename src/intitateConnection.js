@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 let url;
 if (process.env.REACT_APP_SERVER_URL)
-    url = process.env.REACT_APP_SERVER_URL;
+    url = "http://" + process.env.REACT_APP_SERVER_URL + "/" ;
 else
     url = "http://localhost:8888/"
 
