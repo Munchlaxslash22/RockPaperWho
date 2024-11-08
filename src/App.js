@@ -1,45 +1,47 @@
-import {useState} from "react";
 import "./App.css";
-import enterButtonImage from './.resources/Enter_Button.jpg';
-
-function Chat() {
-  const [msgText, setMsgText] = useState('');
-  const [msg, setMsg] = useState('');
-
-
-  const TextChat = () => (
-      <textarea readOnly id="chat">
-        {msgText}
-      </textarea>
-  )
-
-  function chat(e) {
-
-      setMsgText(msgText + msg);
-      setMsg('');
-    e.preventDefault();
-    // You got this Jack! You can do it! o/
-      // Hey if you see this, I've pushed correctly :)
-  }
-
-  return (
-      <>
-        <TextChat />
-        <form onSubmit={chat}>
-        <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={"Type words"} autoFocus id="typeChat">
-        </textarea> <img src={enterButtonImage} id={"chatButton"}  alt={"Enter"}/>
-        </form>
-      </>
-  )
-}
+import {Chat} from "./Chat";
+import {useRef, useState} from "react";
+import {socket} from "./intitateConnection";
 
 
 function App() {
+    const [players, setPlayers] = useState([]);
+    const nameRef = useRef(null);
+
+    socket.on('setup', pl => {
+        console.log(pl)
+        try{
+            setPlayers(pl);
+        }
+        catch (e){
+            throw e;
+        }
+    })
+
+
   return (
       <div className="App-header">
         <center>
           <div id="center">
-            <Chat />
+              <button onClick={() => socket.connect()}>Connect</button>
+              <button onClick={() => socket.emit('setup', nameRef.current.value)}>Join</button>
+              <form onSubmit={(e) => e.preventDefault()}>
+                  <label aria-label={"name"} htmlFor={"name"}>name</label>
+                  <input ref={nameRef} name={"name"} form={"text"}/>
+              </form>
+              <table id={"#tab"}>
+                  {
+                      players.map(player => {
+                          return (<>
+                          <tr>
+                              <td>
+                                  {player.name} is connected.
+                              </td>
+                          </tr>
+                          </>)
+                      })
+                  }
+              </table>
           </div>
         </center>
       </div>
