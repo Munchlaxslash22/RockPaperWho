@@ -15,7 +15,7 @@ module.exports = {
             const config = configFunction(proxy, allowedHost);
             // Set X-Frame-Options header
             config.headers = {
-                "Access-Control-Allow-Origin": "http://localhost:8888/*",
+                "Access-Control-Allow-Origin": process.env.REACT_APP_SERVER_URL,
                 'X-Frame-Options': 'deny'
             }
             return config;
