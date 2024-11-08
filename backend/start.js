@@ -1,5 +1,14 @@
+let createServer;
+if (process.env.HTTPS){
+    createServer = require('https').createServer;
+} else {
+    createServer = require('http').createServer;
+}
+
+
+const server = createServer();
 const { Server } = require('socket.io');
-const io = new Server({
+const io = new Server(server, {
     cors: {
         origin: '*',
     }
