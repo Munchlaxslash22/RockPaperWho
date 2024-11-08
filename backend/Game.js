@@ -19,6 +19,7 @@ class Game {
 
     clearTeams() {
         //I believe this sets vote in the Player class to null.
+        
     }
 
     calculateWinner() {
