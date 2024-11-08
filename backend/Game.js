@@ -5,11 +5,11 @@ class Game {
         this.blueTeamPrompt = null;
         this.gameRound = 0;
         this.gameEnd = 0;         //This is the round that the game ends.
-        this.pageIndex
+        this.pageIndex = 0;       //This is the current webpage being displayed
     }
 
     set pageIndex(index) {
-
+        this.pageIndex = index;
     }
 
     clearAllPrompts() {
@@ -44,6 +44,6 @@ class Game {
         // Final player declared winner
 
         // Prompt for another round, if so restart game loop
-        
+
     }
 }
