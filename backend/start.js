@@ -1,7 +1,45 @@
 // This will send whatever you type in to whoever sends a request
 
+const {createServer} = require('http');
 const { Server } = require('socket.io');
-const io = new Server({
+
+
+const server = createServer()
+
+server.on('request', (req , res) => {
+    if (req.url === "/favicon.ico") {
+        res.statusCode = 404;
+        res.end()
+    }
+
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/plain");
+});
+
+
+
+
+
+
+server.listen(80);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// interaction
+const io = new Server(server, {
     cors: {
         origin: '*',
     }
@@ -9,7 +47,10 @@ const io = new Server({
 
 const players = [];
 
+
+// ON PLAYER CONNECTION
 io.on('connection', (socket) => {
+
     socket.on('setup', (name) => {
         console.log(name);
         players.push({
