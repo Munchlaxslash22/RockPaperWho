@@ -46,6 +46,7 @@ const io = new Server(server, {
 });
 
 const players = [];
+lobbyObj = {};
 
 
 // ON PLAYER CONNECTION
