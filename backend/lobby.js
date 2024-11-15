@@ -29,4 +29,20 @@ class Lobby{
     //integrate with front end
     }
 
+    generateLobbyCode(){
+
+        lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
+
+        //generates unique lobby code
+        while(lobbyCode != /* LobbyCodeArray */) {
+
+        lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
+
+        }   
+
+
+
+        return lobbyCode;
+    }
+
 }
