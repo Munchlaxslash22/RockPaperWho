@@ -8,6 +8,7 @@ class Player {
         this.vote = null;
         this.isReady = false;
         this.isOut = false;
+        this.voteCount = 0;
     }
 
     constructor(name, playerID, isHost){
@@ -18,6 +19,7 @@ class Player {
         this.vote = null;
         this.isReady = false;
         this.isOut = false;
+        this.voteCount = 0;
     }
 
     set prompt(myPrompt){

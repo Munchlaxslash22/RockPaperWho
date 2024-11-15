@@ -12,18 +12,53 @@ class Game {
         this.pageIndex = index;
     }
 
+    promptForVotes(player1, player2) {
+        // Display player prompts to the console
+        console.log(`1. ${player1.name}'s prompt: ${player1.prompt}`);
+        console.log(`2. ${player2.name}'s prompt: ${player2.prompt}`);
+
+        // Prompt the user for their vote
+        let vote = prompt(`Who do you vote for? Enter 1 for ${player1.name} or 2 for ${player2.name}:`);
+
+        // Simple vote counting logic
+        if (vote === '1') {
+            player1.voteCount = (player1.voteCount) + 1;
+        } else if (vote === '2') {
+            player2.voteCount = (player2.voteCount) + 1;
+        } else {
+            console.log("Invalid vote. Please enter 1 or 2.");
+            // Optionally, you could recall this function to prompt again:
+            // promptForVotes(player1, player2);
+        }
+    }
+
     clearAllPrompts() {
         this.redTeamPrompt = null;
         this.blueTeamPrompt = null;
     }
 
     clearTeams() {
-        //I believe this sets vote in the Player class to null.
-        
+        //Sets vote in the Player class to null.
+        this.playerLobby.playerList.forEach(player => {
+            player.vote = null;
+        });
     }
 
-    calculateWinner() {
+    calculateTurnWinner() {
         //We need to add something to count wins for each player.
+
+        let maxVotes = 0;
+        let winner = null;
+
+        //Cycles through each player's # of votes
+        this.playerLobby.playerList.forEach(player => {
+            if (player.voteCount > maxVotes) {
+                maxVotes = player.voteCount;    //Stores # of votes if > previous player
+                winner = player;                //and stores player
+            }
+        });
+
+        return winner;
     }
 
     goBackToLobby() {
@@ -41,13 +76,24 @@ class Game {
 
         // Loop for each pair
         this.playerLobby.playerList.forEach(Player => {
-            
-            // Show off each pair
 
             // Players access chat
 
-            // Players vote who wins
+            // Show off each pair
+            for (let i = 0; i < this.playerLobby.playerList.length; i += 2) {
+                const player1 = this.playerLobby.playerList[i];
+                const player2 = this.playerLobby.playerList[i + 1] || null;
 
+                // Players vote who wins
+                if (player2) {
+                    // Display both players' prompts and allow voting
+                    this.promptForVotes(player1, player2); // Replace with actual vote function
+                }
+                //player who wins(has more votes for current set) goes to next round
+                let turnWinner = this.calculateTurnWinner();
+                //Reset # of votes player has
+
+            }
             // Loop until 1 player remains
 
         })
