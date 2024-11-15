@@ -20,8 +20,8 @@ class Lobby{
 
     //starts the game (currently pseudocode)
     startGame(playerList, host) {
-        //if isReady in playerlist is all true, promp host to start game
-    if(playerList.every(player.isReady = true)){
+        //if isReady in playerlist is all true, prompt host to start game
+    if(playerList.every(Player.isReady = true)){
         // start game
     }
     else
