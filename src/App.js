@@ -3,6 +3,8 @@ import {Chat} from "./Chat";
 import {useRef, useState} from "react";
 import {socket} from "./intitateConnection";
 
+function connect() {socket.connect()}
+
 
 function App() {
     const [players, setPlayers] = useState([]);
@@ -18,32 +20,22 @@ function App() {
         }
     })
 
+    function join(){socket.emit('setup', nameRef.current.value)}
+
   return (
       <div className="App-header">
-        <center>
           <div id="center">
-              <button onClick={() => socket.connect()}>Connect</button>
-              <button onClick={() => socket.emit('setup', nameRef.current.value)}>Join</button>
+              <button onClick={connect}>Connect</button>
               <form onSubmit={(e) => e.preventDefault()}>
-                  <label aria-label={"name"} htmlFor={"name"}>name</label>
-                  <input ref={nameRef} name={"name"} form={"text"}/>
+                  <label aria-label={"name"} htmlFor={"name"}>name</label>:&nbsp;
+                  <input ref={nameRef} name={"name"} form={"text"}/>&nbsp;&nbsp;
+                  <label aria-label={"room id"} htmlFor={"roomId"}>room id</label>:&nbsp;
+                  <input name={"roomID"} form={"text"}/>
+                  <br />
+                  <button onClick={join}>Join</button> <button>Create</button>
               </form>
-              <table id={"#tab"}>
-                  {
-                      players.map(player => {
-                          return (<>
-                          <tr>
-                              <td>
-                                  {player.name} is connected.
-                              </td>
-                          </tr>
-                          </>)
-                      })
-                  }
-              </table>
               <p>{process.env.REACT_APP_SERVER_URL}</p>
           </div>
-        </center>
       </div>
   );
 }

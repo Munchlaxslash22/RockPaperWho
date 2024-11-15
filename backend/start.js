@@ -1,7 +1,32 @@
 // This will send whatever you type in to whoever sends a request
 
-const { Server } = require('socket.io');
-const io = new Server({
+import {prompt} from "./Game.js";
+import {createServer} from  "http";
+import fs from "fs";
+import { Server } from "socket.io";
+
+
+const server = createServer()
+
+server.on('request', (req , res) => {
+    if (req.url === "/favicon.ico") {
+        res.statusCode = 404;
+        res.end()
+    }
+
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/html");
+
+    fs.readFile("index.html", (err, data) => {
+
+    })
+
+});
+
+
+
+// interaction
+const io = new Server(server, {
     cors: {
         origin: '*',
     }
@@ -9,7 +34,10 @@ const io = new Server({
 
 const players = [];
 
+
+// ON PLAYER CONNECTION
 io.on('connection', (socket) => {
+
     socket.on('setup', (name) => {
         console.log(name);
         players.push({
@@ -30,5 +58,9 @@ io.on('connection', (socket) => {
 process.on('exit', () => {
     io.close();
 })
+
+
+
+server.listen(80);
 
 io.listen(8888);

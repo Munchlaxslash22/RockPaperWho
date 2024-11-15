@@ -8,13 +8,22 @@ code {
 }
 
 #center {
-    background-color: white;
     color: black;
-    width: 50vw;
-    height: 50vh;
+    width: 80vw;
+    height: 80vh;
     border-radius: 50px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    margin: 20px;
+    box-sizing: border-box;
+    background:
+            linear-gradient(whitesmoke 0 0) padding-box, /*this is your grey background*/
+            linear-gradient(to top, yellow, blue) border-box;
+    border: 5px solid transparent;
 }
 
 textarea#chat {
