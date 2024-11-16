@@ -1,50 +1,42 @@
 // This will send whatever you type in to whoever sends a request
 
-import {prompt} from "./Game.js";
-import {createServer} from  "http";
-import fs from "fs";
 import { Server } from "socket.io";
+let server;
+if (process.env.REACT_APP_SERVER_URL && !process.env.REACT_APP_SERVER_URL.includes("localhost")) {
+    server = await import("startServer.js");
+}
 
-
-const server = createServer()
-
-server.on('request', (req , res) => {
-    if (req.url === "/favicon.ico") {
-        res.statusCode = 404;
-        res.end()
-    }
-
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/html");
-
-    fs.readFile("index.html", (err, data) => {
-
-    })
-
-});
-
-
-
-// interaction
-const io = new Server(server, {
+const sOptions = {
     cors: {
         origin: '*',
     }
-});
+};
 
-const players = [];
+let io;
+// interaction
+if (server) {
+    io = new Server(server, sOptions);
+} else {
+    io = new Server(sOptions);
+}
+
+const players = {};
+const getPlayers = () => Object.keys(players);
 
 
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {
 
     socket.on('setup', (name) => {
+        let id = Math.floor(Math.random() * 65536).toString(16);
+
         console.log(name);
-        players.push({
+        players[id] = {
             name: name,
-            socket: socket,
-        });
-        io.emit('setup', players.map(p => {return {name: p.name}}))
+            socket: socket
+        }
+
+        io.emit('setup', getPlayers().map(p => {return {name: p.name}}));
     })
 
     socket.on('disconnect', () => {
@@ -58,9 +50,5 @@ io.on('connection', (socket) => {
 process.on('exit', () => {
     io.close();
 })
-
-
-
-server.listen(80);
 
 io.listen(8888);
