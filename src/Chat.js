@@ -2,19 +2,20 @@ import {useState} from "react";
 import enterButtonImage from ".//.resources/Enter_Button.jpg";
 
 export function Chat() {
-    const [msgText, setMsgText] = useState('');
+    const [ChatMessages, setChatMessages] = useState('');
     const [msg, setMsg] = useState('');
 
 
-    const TextChat = () => (
+    const TextChat = function () {
+        return (
         <textarea readOnly id="chat">
-        {msgText}
-      </textarea>
-    )
+        {ChatMessages}
+        </textarea>
+        )}
 
     function chat(e) {
-
-        setMsgText(msgText + msg);
+        if (msg.trim() === "") return;
+        setChatMessages(ChatMessages + msg);
         setMsg('');
         e.preventDefault();
         // You got this Jack! You can do it! o/
@@ -25,9 +26,11 @@ export function Chat() {
         <>
             <TextChat/>
             <form onSubmit={chat}>
-        <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={"Type words"} autoFocus id="typeChat">
-        </textarea> <img src={enterButtonImage} id={"chatButton"} alt={"Enter"}/>
+                <input value={msg} onChange={e => setMsg(e.target.value)}
+                       placeholder={"Type words"} autoFocus id="typeChat">
+                </input><img src={enterButtonImage} onClick={chat} id={"chatButton"} alt={"Enter"}/>
             </form>
+            {msg}
         </>
     )
 }
