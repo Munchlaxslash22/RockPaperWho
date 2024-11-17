@@ -21,7 +21,8 @@ if (server) {
 }
 
 const players = {};
-const getPlayers = () => Object.keys(players);
+const getPlayers = () => Object.values(players);
+const getConnectedIDs = () => Object.keys(players);
 
 const activeLobbys = {};
 
@@ -31,6 +32,8 @@ io.on('connection', (socket) => {
 
     socket.on('setup', (name) => {
         let id = Math.floor(Math.random() * 65536).toString(16);
+        while (id in getConnectedIDs())
+            id = Math.floor(Math.random() * 65536).toString(16);
 
         console.log(name);
         players[id] = {
