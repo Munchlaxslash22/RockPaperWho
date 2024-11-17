@@ -23,6 +23,8 @@ if (server) {
 const players = {};
 const getPlayers = () => Object.keys(players);
 
+const activeLobbys = {};
+
 
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {

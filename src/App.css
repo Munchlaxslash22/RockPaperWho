@@ -14,13 +14,8 @@
 }
 
 #chatButton {
-  height: 50px;
+  height: 25px;
+  border-radius: 5px;
 }
 
-textarea#typeChat {
-  min-height: 50px;
-  max-height: 50px;
-  min-width: max-content;
-  max-width: max-content;
 
-}

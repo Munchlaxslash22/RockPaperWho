@@ -9,8 +9,6 @@ code {
 
 #center {
     color: black;
-    width: 80vw;
-    height: 80vh;
     border-radius: 50px;
     display: flex;
     flex-direction: column;
@@ -21,7 +19,7 @@ code {
     margin: 20px;
     box-sizing: border-box;
     background:
-            linear-gradient(whitesmoke 0 0) padding-box, /*this is your grey background*/
+            linear-gradient(whitesmoke, whitesmoke) padding-box,
             linear-gradient(to top, yellow, blue) border-box;
     border: 5px solid transparent;
 }
