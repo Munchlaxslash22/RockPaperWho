@@ -1,7 +1,7 @@
 import {useState} from "react";
 import enterButtonImage from ".//.resources/Enter_Button.jpg";
 
-export function Chat() {
+export default function Chat() {
     const [ChatMessages, setChatMessages] = useState('');
     const [msg, setMsg] = useState('');
 

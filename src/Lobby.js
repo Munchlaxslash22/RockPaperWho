@@ -1,4 +1,5 @@
 import {socket} from "./intitateConnection";
+import * as React from "react";
 
 export default class Lobby extends React.Component {
     isPlayerRefresh = false;
