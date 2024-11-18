@@ -1,7 +1,9 @@
 import "./App.css";
-import {Chat} from "./Chat";
+import Chat from "./Chat";
 import {useRef, useState} from "react";
 import {socket} from "./intitateConnection";
+import Lobby from "./Lobby";
+
 
 function connect() {socket.connect()}
 
@@ -17,7 +19,10 @@ function App() {
         case 1:
             CurrentState = Chat;
             break;
+        case 2:
+            CurrentState = Lobby;
         default:
+
     }
 
 
