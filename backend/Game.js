@@ -1,3 +1,4 @@
+import Lobby from "./lobby.js"
 class Game {
     constructor(roomCode) {
         this.playerLobby = new Lobby(roomCode);
@@ -67,39 +68,46 @@ class Game {
 
     gameLoop(){
         // Prompt every individual in the collection of players for their "answer"
-        this.playerLobby.playerList.forEach(Player => {
-            // Prompt for responses
-            let recievedPrompt = ""; //somefunction
-            // Set responces
-            Player.prompt(recievedPrompt);
-        });
 
-        // Loop for each pair
-        this.playerLobby.playerList.forEach(Player => {
+        // Shuffle the players so they are in a random order
 
-            // Players access chat
+        let tempWinner = playerLobby.playerList[0];
+        for (let i = 1; i < playerLobby.playerList.length-1; i++) { //this loop intentionally runs one shorter
+                                                                            //than typical!!
+            let blueLeader = tempWinner;
+            let redLeader = playerLobby.playerList[i];
+            let blueVoters = [blueLeader];
+            let redVoters = [redLeader];
+            openChat(); //<- doesn't exist, but basically this is when we want players to be able to start discussing
+            // 3:00 minute wait!
+            this.promptForVotes(); //<- not sure how to retrieve votes from this, but this function need rewriting so
+            if (blueVoters.length === redVoters.length) {
+                // tie breaker round!
+                blueVoters = [blueLeader];
+                redVoters = [redLeader];
+                // let everyone know this is a tie breaker!
+                this.promptForVotes();
+                // if it's a tie again, then we pick randomly
+                if (blueVoters.length === redVoters.length) {
+                    if (Math.floor(Math.random() * 2) = 1) {
+                        //handling red team winning
+                        tempWinner = redLeader;
+                    } else {
+                        //handling blue team winning
 
-            // Show off each pair
-            for (let i = 0; i < this.playerLobby.playerList.length; i += 2) {
-                const player1 = this.playerLobby.playerList[i];
-                const player2 = this.playerLobby.playerList[i + 1] || null;
+                    }
 
-                // Players vote who wins
-                if (player2) {
-                    // Display both players' prompts and allow voting
-                    this.promptForVotes(player1, player2); // Replace with actual vote function
                 }
-                //player who wins(has more votes for current set) goes to next round
-                let turnWinner = this.calculateTurnWinner();
-                //Reset # of votes player has
-
             }
-            // Loop until 1 player remains
+            if (redVoters.length > blueVoters.length) {
+                //handling red team winning
+                tempWinner = redLeader;
+            } else {
+                //handling blue team winning
 
-        })
-        // Final player declared winner
+            } //theres more for both of those above handles, but this is the framework for a game
 
-        // Prompt for another round, if so restart game loop
+        }
 
     }
 }
@@ -112,18 +120,19 @@ export function prompt(msg) {
 
         let stdin = process.stdin;
 
-// without this, we would only get streams once enter is pressed
+        // without this, we would only get streams once enter is pressed
         stdin.setRawMode(true);
 
-// resume stdin in the parent process (node app won't quit all by itself
-// unless an error or process.exit() happens)
+        // resume stdin in the parent process (node app won't quit all by itself
+        // unless an error or process.exit() happens)
         stdin.resume();
 
-// i don't want binary, do you?
+        // i don't want binary, do you?
+        // na, but ASCII might be funny
         stdin.setEncoding('utf8');
 
         let str = '';
-// on any data into stdin
+        // on any data into stdin
         stdin.on('data', function getInfo(key) {
 
             // ctrl-c ( end of text )

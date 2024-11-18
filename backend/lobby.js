@@ -1,4 +1,4 @@
-class Lobby{
+export class Lobby{
     constructor(roomCode) {
         this.host = null;
         this.playerList = [];
