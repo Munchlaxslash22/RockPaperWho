@@ -1,9 +1,11 @@
 import {useState} from "react";
 import enterButtonImage from ".//.resources/Enter_Button.jpg";
+import pressedButtonIMG from ".//.resources/Enter_Button_Pressed.jpg";
 
-export function Chat() {
+export default function Chat() {
     const [ChatMessages, setChatMessages] = useState('');
     const [msg, setMsg] = useState('');
+    const [img, setImg] = useState(enterButtonImage);
 
 
     const TextChat = function () {
@@ -28,7 +30,13 @@ export function Chat() {
             <form onSubmit={chat}>
                 <input value={msg} onChange={e => setMsg(e.target.value)}
                        placeholder={"Type words"} autoFocus id="typeChat">
-                </input><img src={enterButtonImage} onClick={chat} id={"chatButton"} alt={"Enter"}/>
+                </input><img src={img} onClick={function (e) {
+                    chat(e);
+                    setImg(pressedButtonIMG);
+                    setTimeout(() => {
+                        setImg(enterButtonImage)
+                    }, 500);
+                }} id={"chatButton"} alt={"Enter"}/>
             </form>
             {msg}
         </>

@@ -1,6 +1,8 @@
 import {socket} from "./intitateConnection";
+import * as React from "react";
 
 export default class Lobby extends React.Component {
+
     isPlayerRefresh = false;
 
     shouldComponentUpdate(nextProps, nextState, nextContext) {
@@ -29,6 +31,8 @@ export default class Lobby extends React.Component {
             this.first  = false;
         }
         return (<div>
+            <p>Lobby ID: {this.props.id}</p>
+
             {Object.values(this.listPlayers).map(player => {
                 return <p key={player.id}>{player.name}</p>
             })}
