@@ -1,11 +1,10 @@
 import "./App.css";
-import Chat from "./Chat";
 import {useRef, useState} from "react";
+import Cookies from "js-cookie";
 import {socket} from "./intitateConnection";
 import Lobby from "./Lobby";
+import Chat from "./Chat";
 
-
-function connect() {socket.connect()}
 
 
 function App() {
@@ -21,8 +20,9 @@ function App() {
             break;
         case 2:
             CurrentState = Lobby;
+            break;
         default:
-
+            break;
     }
 
 
@@ -33,6 +33,8 @@ function App() {
               <div>
               <button onClick={() => setState(0)}>Login</button>
               <button onClick={() => setState(1)}>Chat</button>
+              <button onClick={() => setState(2)}>Lobby</button>
+
               </div>
           </div>
           <div id="center">
@@ -42,24 +44,24 @@ function App() {
   );
 }
 
+
 function Login() {
-    const [players, setPlayers] = useState([]);
-    const nameRef = useRef(null);
+    const nameRef = useRef("");
 
-    socket.on('setup', pl => {
-        console.log(pl)
-        try{
-            setPlayers(pl);
-        }
-        catch (e){
-            throw e;
-        }
-    })
 
-    function join(){socket.emit('setup', nameRef.current.value)}
+    async function join() {
+        let getID = new Promise((resolve) => {
+            socket.on("setup", (id) => resolve(id))
+        });
+
+        let id = Cookies.get("id");
+        socket.emit("setup", id);
+        id = await getID;
+        Cookies.set("id", id);
+        return id;
+    }
 
     return (<>
-        <button onClick={connect}>Connect</button>
         <form onSubmit={(e) => e.preventDefault()}>
             <label aria-label={"name"} htmlFor={"name"}>name</label>:&nbsp;
             <input ref={nameRef} name={"name"} form={"text"}/>&nbsp;&nbsp;

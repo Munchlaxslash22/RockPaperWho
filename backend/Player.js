@@ -1,37 +1,31 @@
-class Player {
+export default class Player {
 
-    constructor() {
+    constructor(id, socket) {
         this.name = "";
-        this.playerID = "";
+        this.playerID = id;
         this.isHost = false;
         this.prompt = "";
         this.vote = null;
         this.isReady = false;
         this.isOut = false;
         this.voteCount = 0;
+        this.currentSocket = socket;
     }
 
-    constructor(name, playerID, isHost){
-        this.name = name;
-        this.playerID = playerID;
-        this.isHost = isHost;
-        this.prompt = "";
-        this.vote = null;
-        this.isReady = false;
-        this.isOut = false;
-        this.voteCount = 0;
-    }
+    // constructor(name, playerID, isHost){
+    //     this.name = name;
+    //     this.playerID = playerID;
+    //     this.isHost = isHost;
+    //     this.prompt = "";
+    //     this.vote = null;
+    //     this.isReady = false;
+    //     this.isOut = false;
+    //     this.voteCount = 0;
+    //     this.currentSocket = null;
+    // }
 
-    set prompt(myPrompt){
-        this.prompt = myPrompt;
-    }
-
-    set vote(myVote){
-        this.vote = myVote;
-    }
-
-    set isOut(knockedOut){
-        this.isOut = knockedOut;
+    disconnect() {
+        this.currentSocket = null;
     }
 
     joinGame(roomId){

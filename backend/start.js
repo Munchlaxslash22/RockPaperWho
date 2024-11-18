@@ -1,5 +1,4 @@
-// This will send whatever you type in to whoever sends a request
-
+import Player from "./Player.js";
 import { Server } from "socket.io";
 let server;
 if (process.env.REACT_APP_SERVER_URL && !process.env.REACT_APP_SERVER_URL.includes("localhost")) {
@@ -30,24 +29,31 @@ const activeLobbys = {};
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {
 
-    socket.on('setup', (name) => {
-        let id = Math.floor(Math.random() * 65536).toString(16);
-        while (id in getConnectedIDs())
-            id = Math.floor(Math.random() * 65536).toString(16);
+    socket.on('setup', (id) => {
 
-        console.log(name);
-        players[id] = {
-            name: name,
-            socket: socket
+        if (players[id]){
+            players[id].currentSocket = socket;
+        }else {
+            id = Math.floor(Math.random() * 4294967295).toString(16);
+            while (id in getConnectedIDs())
+                id = Math.floor(Math.random() * 4294967295).toString(16);
+            players[id] = new Player(id, socket);
+            console.log(id);
         }
 
-        io.emit('setup', getPlayers().map(p => {return {name: p.name}}));
+        socket.emit('setup', id);
+
+        socket.on('disconnect', () => {
+            players[id].currentSocket = null;
+        })
+
     })
+
 
     socket.on('disconnect', () => {
         console.log('Lost connection to ' + socket.conn.remoteAddress);
-    })
 
+    })
     console.log('New connection from ' + socket.conn.remoteAddress);
 })
 
