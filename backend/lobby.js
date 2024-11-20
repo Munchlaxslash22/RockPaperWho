@@ -1,4 +1,6 @@
-export class Lobby{
+export default class Lobby{
+    static lobbyList = {};
+
     constructor(roomCode) {
         this.host = null;
         this.playerList = [];
@@ -21,7 +23,7 @@ export class Lobby{
     //starts the game (currently pseudocode)
     startGame(playerList, host) {
         //if isReady in playerlist is all true, prompt host to start game
-    if(playerList.every(Player.isReady = true)){
+    if(playerList.every(player => player.isReady === true)){
         // start game
     }
     else
@@ -30,18 +32,11 @@ export class Lobby{
     }
 
     generateLobbyCode(){
-
-        lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
-
+        let lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
         //generates unique lobby code
-        while(lobbyCode != /* lobbyroomcode */) {
-
-        lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
-
-        }   
-
-
-
+        while(Object.keys(Lobby.lobbyList).includes(lobbyCode)) {
+            lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
+        }
         return lobbyCode;
     }
 

@@ -33,12 +33,13 @@ io.on('connection', (socket) => {
 
         if (players[id]){
             players[id].currentSocket = socket;
+            console.log("User " + id + " reconnected.")
         }else {
             id = Math.floor(Math.random() * 4294967295).toString(16);
             while (id in getConnectedIDs())
                 id = Math.floor(Math.random() * 4294967295).toString(16);
             players[id] = new Player(id, socket);
-            console.log(id);
+            console.log("New user created: " + id);
         }
 
         socket.emit('setup', id);
