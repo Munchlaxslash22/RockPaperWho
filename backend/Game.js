@@ -89,7 +89,7 @@ class Game {
                 this.promptForVotes();
                 // if it's a tie again, then we pick randomly
                 if (blueVoters.length === redVoters.length) {
-                    if (Math.floor(Math.random() * 2) = 1) {
+                    if (Math.floor(Math.random() * 2) === 1) {
                         //handling red team winning
                         tempWinner = redLeader;
                     } else {
