@@ -1,25 +1,28 @@
 // This will send whatever you type in to whoever sends a request
-
-import {createServer} from  "http";
+import {createServer} from  "node:http";
 import fs from "fs";
 
 
-const server = createServer()
-
-server.on('request', (req , res) => {
-    if (req.url === "/favicon.ico") {
-        res.statusCode = 404;
-        res.end()
-    }
-
-    res.statusCode = 200;
+const server = createServer((req, res) => {
     res.setHeader("Content-Type", "text/html");
+    let url = req.url;
+    if (url == "/") url = "/index.html";
 
-    fs.readFile("index.html", (err, data) => {
 
+
+    fs.readFile("./build" + url, (err, data) => {
+        if (err) {
+            console.log(err)
+            res.statusCode = 404;
+            res.end();
+        } else{
+            res.statusCode = 200;
+            res.end(data);
+        }
     })
+    console.log("Request for " + req.url);
+})
 
-});
 
 
 // ON PLAYER CONNECTION

@@ -28,9 +28,7 @@ const activeLobbys = {};
 
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {
-
     socket.on('setup', (id) => {
-
         if (players[id]){
             players[id].currentSocket = socket;
             console.log("User " + id + " reconnected.")
