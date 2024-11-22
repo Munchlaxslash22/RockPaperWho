@@ -159,6 +159,4 @@ export function prompt(msg) {
             console.log(str);
         });
     })
-
-
 }

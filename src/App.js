@@ -2,10 +2,12 @@ import "./App.css";
 import {useRef, useState} from "react";
 import Cookies from "js-cookie";
 import {socket} from "./intitateConnection";
-import Lobby from "./Lobby";
-import Chat from "./Chat";
+import Lobby from "./comp/Lobby";
+import Chat from "./comp/Chat";
 
 
+export const connectedPlayers = {};
+let clientId = 0;
 
 function App() {
     const [state, setState] = useState(null);
@@ -58,7 +60,7 @@ function Login() {
         socket.emit("setup", id);
         id = await getID;
         Cookies.set("id", id);
-        return id;
+        clientId = id;
     }
 
     return (<>
