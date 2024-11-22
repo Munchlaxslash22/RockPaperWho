@@ -5,8 +5,6 @@ import {socket} from "./intitateConnection";
 import Lobby from "./comp/Lobby";
 import Chat from "./comp/Chat";
 
-
-export const connectedPlayers = {};
 export let clientId = 0;
 
 function App() {

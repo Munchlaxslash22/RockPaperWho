@@ -14,6 +14,8 @@ class Game {
         this.pageIndex = 0;       //This is the current webpage being displayed
     }
 
+
+
     join(socket) {
         if (Object.keys(this.gamePlayers).includes(socket.id))
             socket.on('chat', (msg) => {

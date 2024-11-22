@@ -1,43 +1,27 @@
 import {socket} from "../intitateConnection";
 import * as React from "react";
+import {memo, useReducer} from "react";
 
-export default class Lobby extends React.Component {
+socket.on('join', (player) => {
+    listPlayers[player.id] = player;
+    update();
+});
+socket.on('exit', ({id}) => {
+    delete this.listPlayers[id];
+    update();
+});
+const listPlayers = {};
+let update;
+const Lobby = memo(function({id}){
+    update = useReducer((x) => x + 1, 0, () => 0);
 
-    isPlayerRefresh = false;
+    return (<div>
+        <p>Lobby ID: {id}</p>
 
-    shouldComponentUpdate(nextProps, nextState, nextContext) {
-        if (this.isPlayerRefresh === true){
-            this.isPlayerRefresh = false;
-            return true;
-        }
-        return false;
-    }
-    first = true;
+        {Object.values(listPlayers).map(player => {
+            return <p key={player.id}>{player.name}</p>
+        })}
+    </div>);
+});
 
-    listPlayers = {};
-
-    render() {
-        if (this.first){
-            socket.on('join', (player) => {
-                this.listPlayers[player.id] = player;
-                this.isPlayerRefresh = true;
-                this.render();
-            });
-            socket.on('exit', ({id}) => {
-                delete this.listPlayers[id];
-                this.isPlayerRefresh = true;
-                this.render();
-            });
-            this.first  = false;
-        }
-        return (<div>
-            <p>Lobby ID: {this.props.id}</p>
-
-            {Object.values(this.listPlayers).map(player => {
-                return <p key={player.id}>{player.name}</p>
-            })}
-            </div>);
-
-
-    }
-}
+export default Lobby;

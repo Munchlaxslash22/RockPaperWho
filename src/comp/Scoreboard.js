@@ -1,6 +1,6 @@
 import {connectedPlayers} from "../App";
 
-export default Scoreboard() {
+export default function Scoreboard() {
     return (<div>
         Blue:
         {Object.values(connectedPlayers).filter(({vote}) => vote === 1).map(({name}) => <p>{name}</p>) }
