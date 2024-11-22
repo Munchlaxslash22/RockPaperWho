@@ -1,12 +1,24 @@
 import Lobby from "./lobby.js"
+import {players} from "./start.js";
+
 class Game {
-    constructor(roomCode) {
-        this.playerLobby = new Lobby(roomCode);
+    gamePlayers = {};
+    playerLobby;
+
+    constructor(lobby) {
+        this.playerLobby = lobby;
         this.redTeamPrompt = null;
         this.blueTeamPrompt = null;
         this.gameRound = 0;
         this.gameEnd = 0;         //This is the round that the game ends.
         this.pageIndex = 0;       //This is the current webpage being displayed
+    }
+
+    join(socket) {
+        if (Object.keys(this.gamePlayers).includes(socket.id))
+            socket.on('chat', (msg) => {
+                Object.values(this.playerLobby.lobbyList).forEach(s => s.emit('chat', msg, this.gamePlayers[socket.id].name));
+            })
     }
 
     set pageIndex(index) {
@@ -62,6 +74,10 @@ class Game {
         return winner;
     }
 
+    get playerList () {
+        return Object.values(this.gamePlayers);
+    }
+
     goBackToLobby() {
 
     }
@@ -70,12 +86,12 @@ class Game {
         // Prompt every individual in the collection of players for their "answer"
 
         // Shuffle the players so they are in a random order
-
-        let tempWinner = playerLobby.playerList[0];
-        for (let i = 1; i < playerLobby.playerList.length-1; i++) { //this loop intentionally runs one shorter
+        let playerList = this.playerList;
+        let tempWinner = playerList[0];
+        for (let i = 1; i < playerList.length-1; i++) { //this loop intentionally runs one shorter
                                                                             //than typical!!
             let blueLeader = tempWinner;
-            let redLeader = playerLobby.playerList[i];
+            let redLeader = playerList[i];
             let blueVoters = [blueLeader];
             let redVoters = [redLeader];
             openChat(); //<- doesn't exist, but basically this is when we want players to be able to start discussing

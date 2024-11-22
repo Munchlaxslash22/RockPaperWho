@@ -19,9 +19,9 @@ if (server) {
     io = new Server(sOptions);
 }
 
-const players = {};
-const getPlayers = () => Object.values(players);
-const getConnectedIDs = () => Object.keys(players);
+export const players = {};
+export const getPlayers = () => Object.values(players);
+export const getConnectedIDs = () => Object.keys(players);
 
 const activeLobbys = {};
 

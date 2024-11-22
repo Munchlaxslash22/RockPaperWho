@@ -1,5 +1,6 @@
 export default class Lobby{
     static lobbyList = {};
+    lobbySockets;
 
     constructor(roomCode) {
         this.host = null;

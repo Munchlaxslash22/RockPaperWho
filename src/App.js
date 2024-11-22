@@ -7,7 +7,7 @@ import Chat from "./comp/Chat";
 
 
 export const connectedPlayers = {};
-let clientId = 0;
+export let clientId = 0;
 
 function App() {
     const [state, setState] = useState(null);

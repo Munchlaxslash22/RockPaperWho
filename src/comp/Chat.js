@@ -1,6 +1,8 @@
 import {useState} from "react";
 import enterButtonImage from "../.resources/Enter_Button.jpg";
 import pressedButtonIMG from "../.resources/Enter_Button_Pressed.jpg";
+import {socket} from "../intitateConnection";
+import {clientId} from "../App";
 
 export default function Chat() {
     const [ChatMessages, setChatMessages] = useState('');
@@ -15,9 +17,13 @@ export default function Chat() {
         </textarea>
         )}
 
+    socket.on('chat', (msg, name) => {
+        setChatMessages(ChatMessages + `\n$[{name}] ` + msg);
+    })
+
     function chat(e) {
         if (msg.trim() === "") return;
-        setChatMessages(ChatMessages + msg);
+        socket.emit('chat', msg);
         setMsg('');
         e.preventDefault();
         // You got this Jack! You can do it! o/
