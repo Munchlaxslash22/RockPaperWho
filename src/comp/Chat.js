@@ -2,7 +2,6 @@ import {useState} from "react";
 import enterButtonImage from "../.resources/Enter_Button.jpg";
 import pressedButtonIMG from "../.resources/Enter_Button_Pressed.jpg";
 import {socket} from "../intitateConnection";
-import {clientId} from "../App";
 
 export default function Chat() {
     const [ChatMessages, setChatMessages] = useState('');
@@ -10,29 +9,26 @@ export default function Chat() {
     const [img, setImg] = useState(enterButtonImage);
 
 
-    const TextChat = function () {
-        return (
-        <textarea readOnly id="chat">
-        {ChatMessages}
-        </textarea>
-        )}
-
+    //all messages come from here, and messages sent loop around.
     socket.on('chat', (msg, name) => {
         setChatMessages(ChatMessages + `\n$[{name}] ` + msg);
     })
 
     function chat(e) {
         if (msg.trim() === "") return;
+        // sends message
         socket.emit('chat', msg);
         setMsg('');
         e.preventDefault();
-        // You got this Jack! You can do it! o/
-        // Hey if you see this, I've pushed correctly :)
     }
 
     return (
         <>
-            <TextChat/>
+            <textarea readOnly id="chat">
+                {ChatMessages}
+            </textarea>
+
+
             <form onSubmit={chat}>
                 <input value={msg} onChange={e => setMsg(e.target.value)}
                        placeholder={"Type words"} autoFocus id="typeChat">

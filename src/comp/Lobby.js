@@ -1,7 +1,13 @@
 import {socket} from "../intitateConnection";
 import * as React from "react";
 import {memo, useReducer} from "react";
+import {clientId} from "../App";
 
+
+//
+//These get called everytime someone joins/leaves the lobby
+//Need to be implemented in backend/Lobby.js
+//
 socket.on('join', (player) => {
     listPlayers[player.id] = player;
     update();
@@ -10,7 +16,11 @@ socket.on('exit', ({id}) => {
     delete this.listPlayers[id];
     update();
 });
-const listPlayers = {};
+export const listPlayers = {
+    clientId : {
+        name: "test"
+    }
+};
 let update;
 const Lobby = memo(function({id}){
     update = useReducer((x) => x + 1, 0, () => 0);
@@ -19,7 +29,7 @@ const Lobby = memo(function({id}){
         <p>Lobby ID: {id}</p>
 
         {Object.values(listPlayers).map(player => {
-            return <p key={player.id}>{player.name}</p>
+            return <p>{player.name}</p>
         })}
     </div>);
 });
