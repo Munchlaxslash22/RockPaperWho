@@ -1,3 +1,5 @@
+import Game from "./Game.js"
+
 export default class Lobby{
     static lobbyList = {};
     lobbySockets;
@@ -5,7 +7,7 @@ export default class Lobby{
     constructor(roomCode) {
         this.host = null;
         this.playerList = [];
-        this.roomCode = roomCode;
+        this.roomCode = this.generateLobbyCode();
     }
 
     //Enter players into the array
@@ -24,12 +26,13 @@ export default class Lobby{
     //starts the game (currently pseudocode)
     startGame(playerList, host) {
         //if isReady in playerlist is all true, prompt host to start game
-    if(playerList.every(player => player.isReady === true)){
-        // start game
-    }
-    else
-    console.log("Players not all ready");
-    //integrate with front end
+        if(playerList.every(player => player.isReady === true)){
+            let activeGame = new Game(this);
+            activeGame.gameLoop();
+        }
+        else
+        console.log("Players not all ready");
+        //integrate with front end
     }
 
     generateLobbyCode(){

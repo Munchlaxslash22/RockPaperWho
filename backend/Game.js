@@ -1,7 +1,11 @@
 import Lobby from "./lobby.js"
 import {players} from "./start.js";
 
-class Game {
+function openChat() {
+    //Doesnt do anything yet, but meant to open up the chat menu so that players can speak with eachother
+}
+
+export default class Game {
     gamePlayers = {};
     playerLobby;
 
@@ -88,6 +92,7 @@ class Game {
         // Prompt every individual in the collection of players for their "answer"
 
         // Shuffle the players so they are in a random order
+
         let playerList = this.playerList;
         let tempWinner = playerList[0];
         for (let i = 1; i < playerList.length-1; i++) { //this loop intentionally runs one shorter
@@ -103,6 +108,7 @@ class Game {
                 // tie breaker round!
                 blueVoters = [blueLeader];
                 redVoters = [redLeader];
+                this.clearTeams();
                 // let everyone know this is a tie breaker!
                 this.promptForVotes();
                 // if it's a tie again, then we pick randomly
@@ -126,7 +132,9 @@ class Game {
             } //theres more for both of those above handles, but this is the framework for a game
 
         }
-
+        if (prompt('Drop in a y if you\'d like to play again')=='y'){
+            this.gameLoop();
+        }
     }
 }
 

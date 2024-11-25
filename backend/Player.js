@@ -12,18 +12,6 @@ export default class Player {
         this.currentSocket = socket;
     }
 
-    // constructor(name, playerID, isHost){
-    //     this.name = name;
-    //     this.playerID = playerID;
-    //     this.isHost = isHost;
-    //     this.prompt = "";
-    //     this.vote = null;
-    //     this.isReady = false;
-    //     this.isOut = false;
-    //     this.voteCount = 0;
-    //     this.currentSocket = null;
-    // }
-
     disconnect() {
         this.currentSocket = null;
     }
