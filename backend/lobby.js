@@ -41,4 +41,35 @@ export default class Lobby{
         return lobbyCode;
     }
 
+    //function to start the timer
+    startTimer(startTimeInMinutes) {
+
+    //turns the minutes into countable seconds
+    let timeInSeconds = startTimeInMinutes * 60;
+    
+    //set the id of the paragraph in html, example is "timer"
+    const countdownElement = document.getElementById('timer');
+    
+    //a bit sloppy, but decrements the count by 1 second and stops when reaches 0
+    const interval = setInterval(function(){updateTimer(timeInSeconds,countdownElement); 
+    
+        timeInSeconds--
+        
+        if(timeInSeconds < 0){
+            clearInterval(interval);
+            }
+        }, 1000);
+    }
+    //function to update the timer display
+    updateTimer(timeInSeconds, countdownElement) {
+        const minutes = Math.floor(timeInSeconds / 60);
+        let seconds = timeInSeconds % 60;
+    
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+    
+            seconds = seconds;
+    
+        countdownElement.innerHTML = `${minutes}: ${seconds}`;
+    }
+
 }
