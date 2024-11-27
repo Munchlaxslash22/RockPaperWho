@@ -2,21 +2,39 @@ import Game from "./Game.js"
 
 export default class Lobby{
     static lobbyList = {};
-    lobbySockets;
+    inactivePlayers = [];
 
-    constructor(roomCode) {
+    constructor() {
         this.host = null;
+        // Contains id's
         this.playerList = [];
         this.roomCode = this.generateLobbyCode();
+        Lobby.lobbyList[this.roomCode] = this;
+        setInterval(this.sweepPlayers, 600000);
     }
 
-    //Enter players into the array
-    setplayerIndex(player, index){
-        if(index > 8)
-            console.log("Not a valid index");
-
-        this.playerList[index] = player;
+    playerJoin(player) {
+        if (this.playerList.length < 7) {
+            this.playerList.push(player);
+            return true;
+        }
+        return false;
     }
+
+    kickPlayer(playerId){
+        if (this.playerList.includes(playerId)) {
+            this.playerList = this.playerList.filter(id => id !== playerId);
+            return true;
+        }
+        return false;
+    }
+
+    sweepPlayers() {
+        for (const id of this.inactivePlayers) {
+            this.kickPlayer(id);
+        }
+    }
+
 
     //sets the host of the lobby
     setHost(player){
@@ -75,4 +93,12 @@ export default class Lobby{
         countdownElement.innerHTML = `${minutes}: ${seconds}`;
     }
 
+    close() {
+        delete Lobby.lobbyList[this.roomCode];
+        this.host = null;
+        this.playerList = null;
+        this.roomCode = null;
+        this.inactivePlayers = null;
+        clearInterval(this.sweepPlayers);
+    }
 }

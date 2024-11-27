@@ -1,11 +1,8 @@
 import "./App.css";
 import {useRef, useState} from "react";
-import Cookies from "js-cookie";
-import {socket} from "./intitateConnection";
+import {socket, clientID} from "./intitateConnection";
 import Lobby from "./comp/Lobby";
 import Chat from "./comp/Chat";
-
-export let clientId = 0;
 
 function App() {
     const [state, setState] = useState(null);
@@ -47,18 +44,24 @@ function App() {
 
 function Login() {
     const nameRef = useRef("");
+    const idRef = useRef("");
 
+    if (typeof clientID == "undefined")
+        throw Error;
 
-    async function join() {
-        let getID = new Promise((resolve) => {
-            socket.on("setup", (id) => resolve(id))
-        });
+    function join() {
+        let name = nameRef.current.value;
+        let roomID = idRef.current.value;
+        if (name && roomID) {
+            socket.emit("createPlayer", name, clientID);
+            socket.emit("join", roomID);
+        }
+    }
 
-        let id = Cookies.get("id");
-        socket.emit("setup", id);
-        id = await getID;
-        Cookies.set("id", id);
-        clientId = id;
+    async function openLobby() {
+        let name = nameRef.current.value;
+        socket.emit("createPlayer", name, clientID);
+        socket.emit("startLobby", clientID);
     }
 
     return (<>
@@ -68,11 +71,13 @@ function Login() {
             <label aria-label={"room id"} htmlFor={"roomId"}>room id</label>:&nbsp;
             <input name={"roomID"} form={"text"}/>
             <br />
-            <button onClick={join}>Join</button> <button>Create</button>
+            <button onClick={join}>Join</button> <button onClick={openLobby}>Create</button>
         </form>
         <p>{process.env.REACT_APP_SERVER_URL}</p>
         </>)
 }
+
+
 
 
 export default App;

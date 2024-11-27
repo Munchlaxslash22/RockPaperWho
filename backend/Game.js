@@ -1,4 +1,4 @@
-import Lobby from "./lobby.js"
+import Lobby from "./Lobby.js"
 import {players} from "./start.js";
 import Player from "./Player.js";
 
