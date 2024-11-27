@@ -1,8 +1,9 @@
 import Lobby from "./lobby.js"
 import {players} from "./start.js";
+import Player from "./Player.js";
 
 function openChat() {
-    //Doesnt do anything yet, but meant to open up the chat menu so that players can speak with eachother
+    //Doesn't do anything yet, but meant to open up the chat menu so that players can speak with eachother
 }
 
 export default class Game {
@@ -16,6 +17,8 @@ export default class Game {
         this.gameRound = 0;
         this.gameEnd = 0;         //This is the round that the game ends.
         this.pageIndex = 0;       //This is the current webpage being displayed
+        //in retrospect, I don't think we need pageIndex or gameEnd.
+        //anyone reading this, leave a tally mark here if you want to rid ourselves of it -> ( / )
     }
 
 
@@ -31,24 +34,16 @@ export default class Game {
         this.pageIndex = index;
     }
 
-    promptForVotes(player1, player2) {
-        // Display player prompts to the console
-        console.log(`1. ${player1.name}'s prompt: ${player1.prompt}`);
-        console.log(`2. ${player2.name}'s prompt: ${player2.prompt}`);
-
-        // Prompt the user for their vote
-        let vote = prompt(`Who do you vote for? Enter 1 for ${player1.name} or 2 for ${player2.name}:`);
-
-        // Simple vote counting logic
-        if (vote === '1') {
-            player1.voteCount = (player1.voteCount) + 1;
-        } else if (vote === '2') {
-            player2.voteCount = (player2.voteCount) + 1;
-        } else {
-            console.log("Invalid vote. Please enter 1 or 2.");
-            // Optionally, you could recall this function to prompt again:
-            // promptForVotes(player1, player2);
+    promptForVotes() {
+        let votesByIndex = [0,0,0,0,0,0,0,0];
+        for (let i = 0; i<this.playerLobby.lobbyList.length; i++) {
+            let votingFor = prompt('Type 1 to vote blue, and type 2 to vote red');
+            if (votingFor == 1)
+                votesByIndex[i] = 1;
+            else if (votingFor == 2)
+                votesByIndex[i] = 2;
         }
+        return votesByIndex; //array of players by voted
     }
 
     clearAllPrompts() {
@@ -95,15 +90,22 @@ export default class Game {
 
         let playerList = this.playerList;
         let tempWinner = playerList[0];
-        for (let i = 1; i < playerList.length-1; i++) { //this loop intentionally runs one shorter
+        for (let i = 1; i < playerList.length; i++) { //this loop intentionally runs one shorter
                                                                             //than typical!!
             let blueLeader = tempWinner;
             let redLeader = playerList[i];
             let blueVoters = [blueLeader];
             let redVoters = [redLeader];
             openChat(); //<- doesn't exist, but basically this is when we want players to be able to start discussing
-            // 3:00 minute wait!
-            this.promptForVotes(); //<- not sure how to retrieve votes from this, but this function need rewriting so
+            this.playerLobby.startTimer(3);
+            let votesByIndex = this.promptForVotes();
+            for (let i = 0; i<votesByIndex.length; i++) {
+                if (votesByIndex[i] === 1)
+                    blueVoters.push(this.playerLobby.playerList[i]);
+                else if (votesByIndex[i] === 2)
+                    redVoters.push(this.playerLobby.playerList[i]);
+            }
+
             if (blueVoters.length === redVoters.length) {
                 // tie breaker round!
                 blueVoters = [blueLeader];
