@@ -4,50 +4,60 @@ import {socket, clientID} from "./intitateConnection";
 import Lobby from "./comp/Lobby";
 import Chat from "./comp/Chat";
 
+
+
+function conditionalRender() {
+	return (props) => {
+	switch (props.state) {
+		case "login":
+			return <Login {...props} />
+		case "lobby":
+			return <Lobby {...props} />
+	}
+	}
+}
+
+let Current = conditionalRender();
+let currentProps = {};
+
 function App() {
-    const [state, setState] = useState(null);
+    const [state, setState] = useState("login");
 
-    let CurrentState = "p";
-    switch (state) {
-        case 0:
-            CurrentState = Login;
-            break;
-        case 1:
-            CurrentState = Chat;
-            break;
-        case 2:
-            CurrentState = Lobby;
-            break;
-        default:
-            break;
-    }
-
-    socket.on('lobby', (lobby) => {
+   socket.on('lobby', (lobby) => {
         if (lobby.state) {
-
+		openLobby(lobby);
+		setState("lobby");
         } else {
             console.log(lobby.message);
         }
     })
-
-
+ 
   return (
       <div className="App-header">
           <div id="center">
               <h4>Test buttons</h4>
               <div>
-              <button onClick={() => setState(0)}>Login</button>
-              <button onClick={() => setState(1)}>Chat</button>
-              <button onClick={() => setState(2)}>Lobby</button>
+              <button onClick={() => setState("login")}>Login</button>
+              <button onClick={() => setState("chat")}>Chat</button>
+              <button onClick={() => setState("lobby")}>Lobby</button>
 
               </div>
           </div>
           <div id="center">
-          <CurrentState/>
+          <Current state={state} {...currentProps} />
           </div>
       </div>
   );
 }
+
+function openLobby(lobby){
+	let players = {};
+	lobby.ids.forEach(id, index => {
+		players[id] = lobby.names[index];
+	}
+	currentProps.players = players;
+}
+
 
 
 function Login() {
@@ -71,6 +81,8 @@ function Login() {
             socket.emit("startLobby", name);
         }
     }
+
+
 
     return (<>
         <form onSubmit={(e) => e.preventDefault()}>
