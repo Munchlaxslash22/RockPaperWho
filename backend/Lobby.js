@@ -3,8 +3,8 @@ import Game from "./Game.js"
 export default class Lobby {
     static lobbyList = {};
 
-    constructor() {
-        this.host = null;
+    constructor(player) {
+        this.host = player;
         // Contains Player objects
         this.playerList = [];
         this.inactivePlayers = [];

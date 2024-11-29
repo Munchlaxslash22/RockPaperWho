@@ -24,8 +24,6 @@ export const players = {};
 export const getPlayers = () => Object.values(players);
 export const getConnectedIDs = () => Object.keys(players);
 
-const activeLobbys = {};
-
 
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {
@@ -48,6 +46,17 @@ io.on('connection', (socket) => {
         socket.on('disconnect', () => {
             pl.currentSocket = null;
             socket.removeAllListeners();
+        })
+	    
+	socket.on('startLobby', (name) => {
+            pl.name = name;
+            let lobby = new Lobby(pl);
+		socket.emit('lobby', {
+			state: true,
+			names: [pl.name],
+			ids: [id],
+			id: lobby.id
+		});
         })
 
         socket.on('joinLobby', (roomID, name) => {
