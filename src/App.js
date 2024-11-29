@@ -52,10 +52,11 @@ function App() {
 
 function openLobby(lobby){
 	let players = {};
-	lobby.ids.forEach(id, index => {
+	lobby.ids.forEach((id, index) => {
 		players[id] = lobby.names[index];
-	}
+	});
 	currentProps.players = players;
+	currentProps.id = lobby.id;
 }
 
 

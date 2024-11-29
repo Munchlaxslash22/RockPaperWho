@@ -1,6 +1,6 @@
 import {socket, clientID} from "../intitateConnection";
 import * as React from "react";
-import {memo, useReducer} from "react";
+import {memo, useReducer, useEffect} from "react";
 
 
 //
@@ -15,21 +15,19 @@ socket.on('exit', ({id}) => {
     delete this.listPlayers[id];
     update();
 });
-export const listPlayers = {
-    clientId : {
-        name: "test"
-    }
-};
+let listPlayers;
 let update;
-const Lobby = memo(function({id}){
+const Lobby = memo(function({id, players}){
     update = useReducer((x) => x + 1, 0, () => 0);
+	useEffect(() => {
+		listPlayers = players;
+	}, [players]);
 
     return (<div>
         <p>Lobby ID: {id}</p>
 
-        {Object.values(listPlayers).map(player => {
-            return <p>{player.name}</p>
-        })}
+        {Object.values(listPlayers).map(playerName => <p>{playerName}</p>)}
+	    <button>Start Game</button>
     </div>);
 });
 
