@@ -55,11 +55,11 @@ io.on('connection', (socket) => {
 			state: true,
 			names: [pl.name],
 			ids: [id],
-			id: lobby.id
-		});
+			roomCode: lobby.roomCode		});
+		console.log(`User ${name}, initiated lobby: ${lobby.roomCode}`);
         })
 
-        socket.on('joinLobby', (roomID, name) => {
+        socket.on('joinLobby', (roomCode, name) => {
             pl.name = name;
             let lobby = Lobby.lobbyList[roomID];
             if (lobby){

@@ -1,32 +1,34 @@
 import {socket, clientID} from "../intitateConnection";
 import * as React from "react";
-import {memo, useReducer, useEffect} from "react";
+import {memo, useState, useEffect} from "react";
 
 
 //
 //These get called everytime someone joins/leaves the lobby
 //Need to be implemented in backend/Lobby.js
 //
-socket.on('join', (player) => {
-    listPlayers[player.id] = player;
-    update();
-});
-socket.on('exit', ({id}) => {
-    delete this.listPlayers[id];
-    update();
-});
-let listPlayers;
-let update;
-const Lobby = memo(function({id, players}){
-    update = useReducer((x) => x + 1, 0, () => 0);
+
+const Lobby = memo(function({roomCode, players}){
+	const [activePlayers, setPlayers] = useState(players);
 	useEffect(() => {
-		listPlayers = players;
+		socket.on('join', (id, name) => {
+			setPlayers((pl) => {
+				pl[id] = name;
+				return pl;
+			});
+		});
+		socket.on('exit', (id) => {
+			setPlayers((pl) => {
+				delete pl[id];
+				return pl;
+			});
+		});
 	}, [players]);
 
     return (<div>
-        <p>Lobby ID: {id}</p>
+        <p>Room Code: {roomCode}</p>
 
-        {Object.values(listPlayers).map(playerName => <p>{playerName}</p>)}
+        {Object.values(activePlayers).map(playerName => <p>{playerName}</p>)}
 	    <button>Start Game</button>
     </div>);
 });

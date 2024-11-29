@@ -54,10 +54,10 @@ export default class Lobby {
     }
 
     generateLobbyCode() {
-        let lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
+        let lobbyCode = Math.floor(Math.random() * 655536).toString(16); 
         //generates unique lobby code
         while (Object.keys(Lobby.lobbyList).includes(lobbyCode)) {
-            lobbyCode = Math.floor(Math.random() * (99999999 - 10000000)) + 10000000;
+            lobbyCode = Math.floor(Math.random() * 655536).toString(16);
         }
         return lobbyCode;
     }

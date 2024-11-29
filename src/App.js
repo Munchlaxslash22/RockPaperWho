@@ -8,12 +8,18 @@ import Chat from "./comp/Chat";
 
 function conditionalRender() {
 	return (props) => {
+	let Comp;
 	switch (props.state) {
 		case "login":
-			return <Login {...props} />
+			Comp = Login
+			break;
 		case "lobby":
-			return <Lobby {...props} />
+			Comp = Lobby;
+			break;
+		default:
+			Comp = <p>Not real</p>;
 	}
+	return <Comp {...currentProps} />
 	}
 }
 
@@ -44,7 +50,7 @@ function App() {
               </div>
           </div>
           <div id="center">
-          <Current state={state} {...currentProps} />
+          <Current state={state} />
           </div>
       </div>
   );
@@ -56,7 +62,7 @@ function openLobby(lobby){
 		players[id] = lobby.names[index];
 	});
 	currentProps.players = players;
-	currentProps.id = lobby.id;
+	currentProps.roomCode = lobby.roomCode;
 }
 
 
@@ -70,9 +76,9 @@ function Login() {
 
     function join() {
         let name = nameRef.current.value;
-        let roomID = idRef.current.value;
-        if (name && roomID) {
-            socket.emit("joinLobby", roomID, name);
+        let roomCode = idRef.current.value;
+        if (name && roomCode) {
+            socket.emit("joinLobby", roomCode, name);
         }
     }
 
