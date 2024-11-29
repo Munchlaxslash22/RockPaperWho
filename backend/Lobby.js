@@ -2,12 +2,13 @@ import Game from "./Game.js"
 
 export default class Lobby {
     static lobbyList = {};
-    inactivePlayers = [];
 
     constructor() {
         this.host = null;
-        // Contains id's
+        // Contains Player objects
         this.playerList = [];
+        this.inactivePlayers = [];
+
         this.roomCode = this.generateLobbyCode();
         Lobby.lobbyList[this.roomCode] = this;
         setInterval(this.sweepPlayers, 600000);

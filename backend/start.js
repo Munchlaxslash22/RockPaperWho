@@ -1,5 +1,6 @@
 import Player from "./Player.js";
 import { Server } from "socket.io";
+import Lobby from "./Lobby.js";
 let server;
 if (process.env.REACT_APP_SERVER_URL && !process.env.REACT_APP_SERVER_URL.includes("localhost")) {
     server = await import("startServer.js");
@@ -40,10 +41,37 @@ io.on('connection', (socket) => {
             console.log("New user created: " + id);
         }
 
+        let pl = players[id];
+
         socket.emit('setup', id);
 
         socket.on('disconnect', () => {
-            players[id].currentSocket = null;
+            pl.currentSocket = null;
+            socket.removeAllListeners();
+        })
+
+        socket.on('joinLobby', (roomID, name) => {
+            pl.name = name;
+            let lobby = Lobby.lobbyList[roomID];
+            if (lobby){
+                if(lobby.playerJoin(pl)){
+                    socket.emit('lobby', {
+                        state: true,
+                        names: lobby.playerList.map(p => p.name),
+                        id: roomID
+                    })
+                } else {
+                    socket.emit('lobby', {
+                        state: false,
+                        message: "Lobby is full (max 8)"
+                    })
+                }
+            } else {
+                socket.emit('lobby', {
+                    state: false,
+                    message: "Lobby does not exist"
+                })
+            }
         })
 
     })

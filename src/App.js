@@ -22,6 +22,14 @@ function App() {
             break;
     }
 
+    socket.on('lobby', (lobby) => {
+        if (lobby.state) {
+
+        } else {
+            console.log(lobby.message);
+        }
+    })
+
 
   return (
       <div className="App-header">
@@ -53,15 +61,15 @@ function Login() {
         let name = nameRef.current.value;
         let roomID = idRef.current.value;
         if (name && roomID) {
-            socket.emit("createPlayer", name, clientID);
-            socket.emit("join", roomID);
+            socket.emit("joinLobby", roomID, name);
         }
     }
 
     async function openLobby() {
         let name = nameRef.current.value;
-        socket.emit("createPlayer", name, clientID);
-        socket.emit("startLobby", clientID);
+        if (name) {
+            socket.emit("startLobby", name);
+        }
     }
 
     return (<>

@@ -1,7 +1,6 @@
-import {socket} from "../intitateConnection";
+import {socket, clientID} from "../intitateConnection";
 import * as React from "react";
 import {memo, useReducer} from "react";
-import {clientId} from "../App";
 
 
 //
