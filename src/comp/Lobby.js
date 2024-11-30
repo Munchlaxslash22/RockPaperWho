@@ -10,14 +10,16 @@ import {memo, useState, useEffect} from "react";
 
 const Lobby = memo(function({roomCode, players}){
 	const [activePlayers, setPlayers] = useState(players);
+	const [test, setTest] = useState("");
 	useEffect(() => {
 		socket.on('join', (id, name) => {
+			setTest("test");
 			setPlayers((pl) => {
 				pl[id] = name;
 				return pl;
 			});
 		});
-		socket.on('exit', (id) => {
+		socket.on('left', (id) => {
 			setPlayers((pl) => {
 				delete pl[id];
 				return pl;
@@ -25,7 +27,9 @@ const Lobby = memo(function({roomCode, players}){
 		});
 	}, [players]);
 
+
     return (<div>
+	    <p>{test}</p>
         <p>Room Code: {roomCode}</p>
 
         {Object.values(activePlayers).map(playerName => <p>{playerName}</p>)}

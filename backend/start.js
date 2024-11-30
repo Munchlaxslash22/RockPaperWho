@@ -24,11 +24,13 @@ export const players = {};
 export const getPlayers = () => Object.values(players);
 export const getConnectedIDs = () => Object.keys(players);
 
+export const removePlayer = (id) => delete players[id];
+
 
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {
     socket.on('setup', (id) => {
-        if (players[id]){
+        if (players[id] != null){
             players[id].currentSocket = socket;
             console.log("User " + id + " reconnected.")
         }else {
@@ -46,6 +48,9 @@ io.on('connection', (socket) => {
         socket.on('disconnect', () => {
             pl.currentSocket = null;
             socket.removeAllListeners();
+		if (pl.lobby) {
+		pl.lobby.disconnect();
+		}
         })
 	    
 	socket.on('startLobby', (name) => {
@@ -61,14 +66,14 @@ io.on('connection', (socket) => {
 
         socket.on('joinLobby', (roomCode, name) => {
             pl.name = name;
-            let lobby = Lobby.lobbyList[roomID];
+            let lobby = Lobby.lobbyList[roomCode];
             if (lobby){
                 if(lobby.playerJoin(pl)){
                     socket.emit('lobby', {
                         state: true,
                         names: lobby.playerList.map(p => p.name),
-			ids: lobby.playerList.map(p > p.id),
-                        id: roomID
+			ids: lobby.playerList.map(p => p.id),
+                        roomCode: roomCode
                     })
                 } else {
                     socket.emit('lobby', {

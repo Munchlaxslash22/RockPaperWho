@@ -61,6 +61,8 @@ function openLobby(lobby){
 	lobby.ids.forEach((id, index) => {
 		players[id] = lobby.names[index];
 	});
+	console.log(lobby);
+	console.log(players);
 	currentProps.players = players;
 	currentProps.roomCode = lobby.roomCode;
 }
@@ -78,11 +80,12 @@ function Login() {
         let name = nameRef.current.value;
         let roomCode = idRef.current.value;
         if (name && roomCode) {
+		console.log("connecting");
             socket.emit("joinLobby", roomCode, name);
         }
     }
 
-    async function openLobby() {
+    function openLobby() {
         let name = nameRef.current.value;
         if (name) {
             socket.emit("startLobby", name);
@@ -96,7 +99,7 @@ function Login() {
             <label aria-label={"name"} htmlFor={"name"}>name</label>:&nbsp;
             <input ref={nameRef} name={"name"} form={"text"}/>&nbsp;&nbsp;
             <label aria-label={"room id"} htmlFor={"roomId"}>room id</label>:&nbsp;
-            <input name={"roomID"} form={"text"}/>
+            <input ref={idRef} name={"roomID"} form={"text"}/>
             <br />
             <button onClick={join}>Join</button> <button onClick={openLobby}>Create</button>
         </form>

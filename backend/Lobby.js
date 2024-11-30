@@ -1,12 +1,16 @@
-import Game from "./Game.js"
+import Game from "./Game.js";
+import {removePlayer} from "./start.js";
+
 
 export default class Lobby {
     static lobbyList = {};
-
     constructor(player) {
-        this.host = player;
-        // Contains Player objects
-        this.playerList = [];
+		this.host = player;
+		player.joinLobby(this);
+
+
+	// Contains Player objects
+        this.playerList = [player];
         this.inactivePlayers = [];
 
         this.roomCode = this.generateLobbyCode();
@@ -14,26 +18,38 @@ export default class Lobby {
         setInterval(this.sweepPlayers, 600000);
     }
 
+	allSockets() {
+		console.log("<player list>");
+		console.log(this.playerList);
+		return this.playerList.map(p => p.currentSocket);
+	}
+
     playerJoin(player) {
         if (this.playerList.length < 7) {
             this.playerList.push(player);
+			this.allSockets().forEach(s => s.emit("join", player.id, player.name));
             return true;
         }
         return false;
     }
 
+	playerLeaves(playerId)
+	{
+		let listWithOut = this.playerList.map(p => p.id).filter(id => id !== playerId).map(id => this.playerList[id]);
+		this.playerList = listWithOut;
+	}
+
     kickPlayer(playerId) {
-        if (this.playerList.includes(playerId)) {
-            this.playerList = this.playerList.filter(id => id !== playerId);
+        if (playerId in this.playerList.map(p => p.id) {
+			playerLeaves(playerId);
+					this.allSockets().forEach(s => s.emit("left", playerId));
             return true;
         }
         return false;
     }
 
     sweepPlayers() {
-        for (const id of this.inactivePlayers) {
-            this.kickPlayer(id);
-        }
+		this.inactivePlayers.forEach(p => kickPlayer(p.id));
     }
 
 
@@ -92,6 +108,11 @@ export default class Lobby {
     }
 
     close() {
+
+		this.playerList.forEach(p => {
+			removePlayer(p.id);
+		}
+
         delete Lobby.lobbyList[this.roomCode];
         this.host = null;
         this.playerList = null;

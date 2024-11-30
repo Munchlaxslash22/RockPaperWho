@@ -9,21 +9,22 @@ export default class Player {
         this.isReady = false;
         this.isOut = false;
         this.voteCount = 0;
+		this.lobby = undefined;
         this.currentSocket = socket;
     }
 
-    disconnect() {
+    disconnect(id) {
         this.currentSocket = null;
     }
 
-    joinGame(roomId){
+	joinLobby(lobby){
         //This player is participating in the game
-
+		this.lobby = lobby;
     }
 
-    leaveGame(){
+    leaveLobby(){
         //This player is leaving a game
-
+		this.lobby = undefined;
     }
 
     requestVote(myVote){
