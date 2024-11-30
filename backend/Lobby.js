@@ -40,8 +40,8 @@ export default class Lobby {
 	}
 
     kickPlayer(playerId) {
-        if (playerId in this.playerList.map(p => p.id) {
-			playerLeaves(playerId);
+        if (playerId in this.playerList.map(p => p.id)) {
+			this.playerLeaves(playerId);
 					this.allSockets().forEach(s => s.emit("left", playerId));
             return true;
         }
@@ -49,7 +49,7 @@ export default class Lobby {
     }
 
     sweepPlayers() {
-		this.inactivePlayers.forEach(p => kickPlayer(p.id));
+		this.inactivePlayers.forEach(p => this.kickPlayer(p.id));
     }
 
 
@@ -109,9 +109,9 @@ export default class Lobby {
 
     close() {
 
-		this.playerList.forEach(p => {
-			removePlayer(p.id);
-		}
+        this.playerList.forEach(p => {
+          removePlayer(p.id);
+        });
 
         delete Lobby.lobbyList[this.roomCode];
         this.host = null;

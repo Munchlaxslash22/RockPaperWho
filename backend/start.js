@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
                     socket.emit('lobby', {
                         state: true,
                         names: lobby.playerList.map(p => p.name),
-			ids: lobby.playerList.map(p => p.id),
+                        ids: lobby.playerList.map(p => p.id),
                         roomCode: roomCode
                     })
                 } else {

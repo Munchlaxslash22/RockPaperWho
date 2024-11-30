@@ -2,7 +2,7 @@ export default class Player {
 
     constructor(id, socket) {
         this.name = "";
-        this.playerID = id;
+        this.id = id;
         this.isHost = false;
         this.prompt = "";
         this.vote = null;
@@ -24,7 +24,7 @@ export default class Player {
 
     leaveLobby(){
         //This player is leaving a game
-		this.lobby = undefined;
+		delete this.lobby
     }
 
     requestVote(myVote){

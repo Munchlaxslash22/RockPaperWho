@@ -16,6 +16,8 @@ function conditionalRender() {
 		case "lobby":
 			Comp = Lobby;
 			break;
+    case "chat":
+      Comp = Chat;
 		default:
 			Comp = <p>Not real</p>;
 	}
@@ -57,11 +59,11 @@ function App() {
 }
 
 function openLobby(lobby){
-	let players = {};
+	let players = {};  
+    console.log(lobby);
 	lobby.ids.forEach((id, index) => {
 		players[id] = lobby.names[index];
 	});
-	console.log(lobby);
 	console.log(players);
 	currentProps.players = players;
 	currentProps.roomCode = lobby.roomCode;
