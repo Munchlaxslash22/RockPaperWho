@@ -25,7 +25,7 @@ const Lobby = memo(function({roomCode, players}){
 				return pl;
 			});
 		});
-	}, [players]);
+	}, [setPlayers]);
 
 
     return (<div>
