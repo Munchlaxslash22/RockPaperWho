@@ -1,7 +1,7 @@
 import {memo, useEffect, useState} from "react";
 import Chat from "./Chat";
 import {socket} from "../intitateConnection";
-import "./Game.css";
+import style from "./Game.module.css";
 
 
 
@@ -15,7 +15,7 @@ const Game = memo(({players}) => {
 
 
     return (
-        <div id={"gameWrapper"}>
+        <div className={style.gameWrapper}>
             <Prompt vis={visibility} set={revealPrompt} />
             <div>
                 <Timer/>
@@ -31,32 +31,14 @@ function Prompt({vis, set}) {
     const [text, setText] = useState('');
     return (
         <div style={{
-            display: vis,
-            backgroundColor: "white",
-            border: "black 2px solid",
-            borderRadius: "20%",
-            position: "absolute",
-            height: "20px",
-            width: "100px",
-            top: "50%",
-            left: "50%",
-            clipPath: "border-box",
-            transform: "translate(-50%, -50%)"
-        }}>
-            <form style={{
-                height: "inherit",
-                width: "inherit"
-            }} onSubmit={(e) => {
+            display: vis
+        }} className={style.form}>
+            <form onSubmit={(e) => {
             set("none");
             setText('');
             e.preventDefault();
         }}>
-                <input style={{
-                    display: "block",
-                    height: "100%",
-                    width: "100%",
-                    padding: "0",
-                }} type={"text"} value={text} onChange={(e) => setText(e.target.value)}/>
+                <input type={"text"} value={text} onChange={(e) => setText(e.target.value)}/>
             </form>
         </div>
             );

@@ -25,10 +25,11 @@ export default function Chat({lobby, players}) {
     return (
         <div>
             <textarea readOnly id="chat" style={{
-                backgroundColor: "grey",
+                backgroundColor: "whitesmoke",
                 height: "60vh",
                 width: "30vw",
                 margin: "10px auto",
+                borderWidth: "5px",
                 borderRadius: "15px",
                 padding: "5px",
                 resize: "none"

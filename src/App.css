@@ -3,7 +3,11 @@
 }
 
 .App-header {
-  background: linear-gradient(45deg,blue, yellow);
+  background-color: aliceblue;
+  background-image: url("./.resources/bg.png");
+  background-repeat: repeat;
+  background-blend-mode: multiply;
+  background-size: 15px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
