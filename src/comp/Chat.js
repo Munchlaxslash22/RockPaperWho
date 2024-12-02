@@ -3,7 +3,7 @@ import enterButtonImage from "../.resources/Enter_Button.jpg";
 import pressedButtonIMG from "../.resources/Enter_Button_Pressed.jpg";
 import {socket} from "../intitateConnection";
 
-export default function Chat() {
+export default function Chat({lobby, players}) {
     const [ChatMessages, setChatMessages] = useState('');
     const [msg, setMsg] = useState('');
     const [img, setImg] = useState(enterButtonImage);
@@ -11,7 +11,7 @@ export default function Chat() {
 
     //all messages come from here, and messages sent loop around.
     socket.on('chat', (msg, name) => {
-        setChatMessages(ChatMessages + `\n$[{name}] ` + msg);
+        setChatMessages(ChatMessages + `\r\n[${name}] ` + msg);
     })
 
     function chat(e) {
@@ -23,8 +23,16 @@ export default function Chat() {
     }
 
     return (
-        <>
-            <textarea readOnly id="chat">
+        <div>
+            <textarea readOnly id="chat" style={{
+                backgroundColor: "grey",
+                height: "60vh",
+                width: "30vw",
+                margin: "10px auto",
+                borderRadius: "15px",
+                padding: "5px",
+                resize: "none"
+            }}>
                 {ChatMessages}
             </textarea>
 
@@ -32,7 +40,10 @@ export default function Chat() {
             <form onSubmit={chat}>
                 <input value={msg} onChange={e => setMsg(e.target.value)}
                        placeholder={"Type words"} autoFocus id="typeChat">
-                </input><img src={img} onClick={function (e) {
+                </input><img src={img} style={{
+                    width : "50px",
+                    verticalAlign: "middle"
+            }}  onClick={function (e) {
                     chat(e);
                     setImg(pressedButtonIMG);
                     setTimeout(() => {
@@ -41,6 +52,6 @@ export default function Chat() {
                 }} id={"chatButton"} alt={"Enter"}/>
             </form>
             {msg}
-        </>
+        </div>
     )
 }

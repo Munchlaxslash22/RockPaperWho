@@ -8,7 +8,7 @@ import {memo, useState, useEffect} from "react";
 //Need to be implemented in backend/Lobby.js
 //
 
-const Lobby = memo(function({roomCode, players}){
+const Lobby = memo(function({roomCode, players, setState}){
 	const [activePlayers, setPlayers] = useState(players);
 	const [test, setTest] = useState("");
 	useEffect(() => {
@@ -25,6 +25,9 @@ const Lobby = memo(function({roomCode, players}){
 				return pl;
 			});
 		});
+		socket.on('gameStart', () => {
+			setState('game');
+		})
 	}, [setPlayers]);
 
 

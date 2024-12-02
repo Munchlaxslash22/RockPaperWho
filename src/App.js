@@ -3,24 +3,30 @@ import {useRef, useState} from "react";
 import {socket, clientID} from "./intitateConnection";
 import Lobby from "./comp/Lobby";
 import Chat from "./comp/Chat";
+import Game from "./comp/Game";
 
 
 
 function conditionalRender() {
 	return (props) => {
 	let Comp;
-	switch (props.state) {
-		case "login":
-			Comp = Login
-			break;
-		case "lobby":
-			Comp = Lobby;
-			break;
-    case "chat":
-      Comp = Chat;
-		default:
-			Comp = <p>Not real</p>;
-	}
+    switch (props.state) {
+        case "login":
+            Comp = Login
+            break;
+        case "lobby":
+            Comp = Lobby;
+            break;
+        case "chat":
+          Comp = Chat;
+          break;
+        case "game":
+            Comp = Game;
+            break;
+        default:
+            Comp = <p>Not real</p>;
+            break;
+    }
 	return <Comp {...currentProps} />
 	}
 }
@@ -48,11 +54,12 @@ function App() {
               <button onClick={() => setState("login")}>Login</button>
               <button onClick={() => setState("chat")}>Chat</button>
               <button onClick={() => setState("lobby")}>Lobby</button>
+              <button onClick={() => setState("game")}>Game</button>
 
               </div>
           </div>
           <div id="center">
-          <Current state={state} />
+          <Current state={state} setState={setState}/>
           </div>
       </div>
   );

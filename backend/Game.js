@@ -1,6 +1,3 @@
-import Lobby from "./Lobby.js"
-import {players} from "./start.js";
-import Player from "./Player.js";
 
 function openChat() {
     //Doesn't do anything yet, but meant to open up the chat menu so that players can speak with eachother
@@ -8,7 +5,6 @@ function openChat() {
 
 export default class Game {
     gamePlayers = {};
-    playerLobby;
 
     constructor(lobby) {
         this.playerLobby = lobby;
@@ -23,11 +19,12 @@ export default class Game {
 
 
 
-    join(socket) {
-        if (Object.keys(this.gamePlayers).includes(socket.id))
-            socket.on('chat', (msg) => {
-                Object.values(this.playerLobby.lobbyList).forEach(s => s.emit('chat', msg, this.gamePlayers[socket.id].name));
-            })
+    join(player) {
+        player.socket.on('chat', (msg) => {
+            this.playerList.forEach(p => p !== player ? p.socket.emit('chat', msg, this.gamePlayers[player.id].name) : false);
+        })
+
+        this.gamePlayers[player.id] = player;
     }
 
     set pageIndex(index) {

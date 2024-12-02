@@ -1,0 +1,7 @@
+#gameWrapper {
+    display: flex;
+    flex-direction: row;
+    & * {
+        display: revert;
+    }
+}

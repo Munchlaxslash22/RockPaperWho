@@ -24,12 +24,3 @@ code {
     border: 5px solid transparent;
 }
 
-textarea#chat {
-    background-color: grey;
-    height: 50%;
-    width: 80%;
-    margin: 10px auto;
-    border-radius: 15px;
-    padding: 5px;
-    resize: none;
-}
