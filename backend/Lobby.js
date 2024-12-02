@@ -19,8 +19,6 @@ export default class Lobby {
     }
 
 	allSockets() {
-		console.log("<player list>");
-		console.log(this.playerList);
 		return this.playerList.map(p => p.currentSocket);
 	}
 
@@ -59,11 +57,12 @@ export default class Lobby {
     }
 
     //starts the game (currently pseudocode)
-    startGame(playerList, host) {
+    startGame(playerList) {
         //if isReady in playerlist is all true, prompt host to start game
         if (playerList.every(player => player.isReady === true)) {
             let activeGame = new Game(this);
             activeGame.gameLoop();
+            this.allSockets().forEach(s => s.emit('game'));
         } else
             console.log("Players not all ready");
         //integrate with front end

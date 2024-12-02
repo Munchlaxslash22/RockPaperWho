@@ -5,7 +5,7 @@ import "./Game.css";
 
 
 
-const Game = memo(({lobby, players}) => {
+const Game = memo(({players}) => {
     const [visibility, revealPrompt] = useState("none");
     useEffect(() => {
         socket.on('prompt', () => {
@@ -21,7 +21,7 @@ const Game = memo(({lobby, players}) => {
             </div>
             <div>
                 <Timer/>
-            <Chat lobby={lobby} players={players}/>
+            <Chat players={players}/>
             </div>
             <Leaderboard/>
         </div>

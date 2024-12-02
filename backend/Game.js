@@ -5,23 +5,29 @@ function openChat() {
 
 export default class Game {
     gamePlayers = {};
+    playerPrompts
 
     constructor(lobby) {
-        this.playerLobby = lobby;
+        this.lobby = lobby;
         this.redTeamPrompt = null;
         this.blueTeamPrompt = null;
         this.gameRound = 0;
         this.gameEnd = 0;         //This is the round that the game ends.
         this.pageIndex = 0;       //This is the current webpage being displayed
         //in retrospect, I don't think we need pageIndex or gameEnd.
-        //anyone reading this, leave a tally mark here if you want to rid ourselves of it -> ( / )
+        //anyone reading this, leave a tally mark here if you want to rid ourselves of it -> ( // )
+
+        this.lobby.playerList.forEach(p => p.socket.on('chat', (msg) => {
+            this.lobby.playerList.forEach(p2 => p2.socket.emit('chat', msg));
+        }))
+        this.gameLoop();
     }
 
 
 
     join(player) {
         player.socket.on('chat', (msg) => {
-            this.playerList.forEach(p => p !== player ? p.socket.emit('chat', msg, this.gamePlayers[player.id].name) : false);
+            this.lobby.playerList.forEach(p => p !== player ? p.socket.emit('chat', msg, this.gamePlayers[player.id].name) : false);
         })
 
         this.gamePlayers[player.id] = player;
@@ -31,16 +37,41 @@ export default class Game {
         this.pageIndex = index;
     }
 
-    promptForVotes() {
-        let votesByIndex = [0,0,0,0,0,0,0,0];
-        for (let i = 0; i<this.playerLobby.lobbyList.length; i++) {
-            let votingFor = prompt('Type 1 to vote blue, and type 2 to vote red');
-            if (votingFor == 1)
-                votesByIndex[i] = 1;
-            else if (votingFor == 2)
-                votesByIndex[i] = 2;
-        }
-        return votesByIndex; //array of players by voted
+    async promptForPrompt() {
+        const pIDs =[];
+        const pPrompts = [];
+        return (await new Promise((resolve) => {
+            this.lobby.playerList.forEach(p => p.socket.emit("prompt"));
+            this.lobby.playerList.forEach(p => p.socket.on("prompt", (prompt) => {
+                pIDs.push(p.id);
+                pPrompts.push(prompt);
+
+                if (pIDs.length >= this.lobby.playerList.length) {
+                    resolve(pIDs.reduce((accumulator, id, index) => {
+                        return {...accumulator, [id]: pPrompts[index]};
+                    }, {}));
+                }
+            }))
+        }));
+    }
+
+    async promptForVotes(idOrder) {
+        let count = 1;
+        let result = await new Promise((resolve) => {
+            const result = {};
+            this.lobby.playerList.forEach(p => p.socket.emit("vote"));
+            this.lobby.playerList.forEach(p => p.socket.on("vote", (v) => {
+                if (v !== 1 && v !== 2)
+                    return;
+                p.socket.emit("voteConfirm");
+                let index = idOrder.indexOf(p.id);
+                result[index] = v;
+                if (count == idOrder.length)
+                    resolve(result);
+                count++;
+            }))
+        })
+        return Object.values(result); //array of player ids by voted
     }
 
     clearAllPrompts() {
@@ -50,7 +81,7 @@ export default class Game {
 
     clearTeams() {
         //Sets vote in the Player class to null.
-        this.playerLobby.playerList.forEach(player => {
+        this.lobby.playerList.forEach(player => {
             player.vote = null;
         });
     }
@@ -85,7 +116,8 @@ export default class Game {
 
         // Shuffle the players so they are in a random order
 
-        let playerList = this.playerList;
+
+        let playerList = this.lobby.playerList.randomize();
         let tempWinner = playerList[0];
         for (let i = 1; i < playerList.length; i++) { //this loop intentionally runs one shorter
                                                                             //than typical!!
@@ -94,8 +126,8 @@ export default class Game {
             let blueVoters = [blueLeader];
             let redVoters = [redLeader];
             openChat(); //<- doesn't exist, but basically this is when we want players to be able to start discussing
-            this.playerLobby.startTimer(3);
-            let votesByIndex = this.promptForVotes();
+            this.lobby.startTimer(3);
+            let votesByIndex = this.promptForVotes(playerList.map(p => p.id));
             for (let i = 0; i<votesByIndex.length; i++) {
                 if (votesByIndex[i] === 1)
                     blueVoters.push(this.playerLobby.playerList[i]);
@@ -185,3 +217,18 @@ export function prompt(msg) {
         });
     })
 }
+
+function randomize(){
+    let temp = this.slice();
+    let final = [];
+    for (let i = 0; i < this.length; i++){
+        const r = Math.random() * temp.length;
+        const y = Math.floor(r)
+        let x = temp[y];
+        final.push(x);
+        temp =  temp.filter((p) => p !== x);
+    }
+    return final;
+}
+
+Array.prototype.randomize = randomize;
