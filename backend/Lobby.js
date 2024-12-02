@@ -4,8 +4,10 @@ import {removePlayer} from "./start.js";
 
 export default class Lobby {
     static lobbyList = {};
+    activeGame;
     constructor(player) {
 		this.host = player;
+        this.activeGame = null;
 		player.joinLobby(this);
 
 	    // Contains Player objects
@@ -19,7 +21,7 @@ export default class Lobby {
 
 
 	allSockets() {
-		return this.playerList.map(p => p.currentSocket);
+		return this.playerList.map(p => p.socket);
 	}
 
 
@@ -66,7 +68,7 @@ export default class Lobby {
         //if isReady in playerlist is all true, prompt host to start game
         if (playerList.every(player => player.isReady === true)) {
             let activeGame = new Game(this);
-            activeGame.gameLoop();
+            this.activeGame = activeGame;
             this.allSockets().forEach(s => s.emit('game'));
         } else
             console.log("Players not all ready");
@@ -78,7 +80,7 @@ export default class Lobby {
         let lobbyCode = Math.floor(Math.random() * 655536).toString(16); 
         //generates unique lobby code
         while (Object.keys(Lobby.lobbyList).includes(lobbyCode)) {
-            lobbyCode = Math.floor(Math.random() * 655536).toString(16);
+            lobbyCode = Math.floor(Math.random() * 65535).toString(16);
         }
         return lobbyCode;
     }
@@ -110,7 +112,7 @@ export default class Lobby {
         seconds = seconds < 10 ? "0" + seconds : seconds.toString();
 
         this.playerList.forEach(p => {
-            p.currentSocket.emit("time", minutes, seconds);
+            p.emit("time", minutes, seconds);
         })
         // countdownElement.innerHTML = `${minutes}: ${seconds}`;
     }

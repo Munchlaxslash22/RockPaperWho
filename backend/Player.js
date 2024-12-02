@@ -6,11 +6,33 @@ export default class Player {
         this.prompt = "";
         this.isReady = false;
 		this.lobby = undefined;
-        this.currentSocket = socket;
+        this.socket = socket;
+    }
+
+    emit(msg, ...arg) {
+        if (this.socket) {
+            this.socket.emit(msg, ...arg);
+        }
+    }
+
+    on(msg, func) {
+        if (this.socket) {
+            this.socket.on(msg, func);
+        }
+    }
+
+    removeEvents(msg){
+        if (this.socket) {
+            this.socket.removeAllListeners(msg);
+        }
     }
 
     disconnect(id) {
-        this.currentSocket = null;
+        this.socket = null;
+    }
+
+    reconnect(socket) {
+        this.socket = socket;
     }
 
 	joinLobby(lobby){

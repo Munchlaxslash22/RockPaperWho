@@ -30,18 +30,26 @@ export const removePlayer = (id) => delete players[id];
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {
     socket.on('setup', (id) => {
-        if (players[id] != null){
-            players[id].currentSocket = socket;
-            console.log("User " + id + " reconnected.")
+        let pl;
+        if (players[id]){
+            pl = players[id];
+            pl.reconnect(socket);
+            console.log("User " + id + " reconnected.");
         }else {
             id = Math.floor(Math.random() * 4294967295).toString(16);
             while (id in getConnectedIDs())
                 id = Math.floor(Math.random() * 4294967295).toString(16);
-            players[id] = new Player(id, socket);
+            pl = new Player(id, socket);
+            players[id] = pl;
             console.log("New user created: " + id);
         }
 
-        let pl = players[id];
+        socket.on('ready', () => {
+            pl.readyUp();
+        });
+        socket.on('unready', () => {
+            pl.readyDown();
+        });
 
         socket.emit('setup', id);
 
@@ -54,8 +62,8 @@ io.on('connection', (socket) => {
         })
 	    
 	socket.on('startLobby', (name) => {
-            pl.name = name;
-            let lobby = new Lobby(pl);
+        pl.name = name;
+        let lobby = new Lobby(pl);
 		socket.emit('lobby', {
 			state: true,
 			names: [pl.name],
@@ -74,18 +82,18 @@ io.on('connection', (socket) => {
                         names: lobby.playerList.map(p => p.name),
                         ids: lobby.playerList.map(p => p.id),
                         roomCode: roomCode
-                    })
+                    });
                 } else {
                     socket.emit('lobby', {
                         state: false,
                         message: "Lobby is full (max 8)"
-                    })
+                    });
                 }
             } else {
                 socket.emit('lobby', {
                     state: false,
                     message: "Lobby does not exist"
-                })
+                });
             }
         })
 

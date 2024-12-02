@@ -10,16 +10,16 @@ export default class Game {
 
     constructor(lobby) {
         this.lobby = lobby;
-        this.lobby.playerList.forEach(p => p.socket.on('chat', (msg) => {
-            this.lobby.playerList.forEach(p2 => p2.socket.emit('chat', msg));
+        this.lobby.playerList.forEach(p => p.on('chat', (msg) => {
+            this.lobby.playerList.forEach(p2 => p2.emit('chat', msg));
         }))
         this.gameLoop();
     }
 
 
     join(player) {
-        player.socket.on('chat', (msg) => {
-            this.lobby.playerList.forEach(p => p !== player ? p.socket.emit('chat', msg, this.gamePlayers[player.id].name) : false);
+        player.on('chat', (msg) => {
+            this.lobby.playerList.forEach(p => p !== player ? p.emit('chat', msg, this.gamePlayers[player.id].name) : false);
         })
 
         this.gamePlayers[player.id] = player;
@@ -30,8 +30,8 @@ export default class Game {
         const pIDs =[];
         const pPrompts = [];
         return (await new Promise((resolve) => {
-            this.lobby.playerList.forEach(p => p.socket.emit("prompt"));
-            this.lobby.playerList.forEach(p => p.socket.on("prompt", (prompt) => {
+            this.lobby.playerList.forEach(p => p.emit("prompt"));
+            this.lobby.playerList.forEach(p => p.on("prompt", (prompt) => {
                 pIDs.push(p.id);
                 pPrompts.push(prompt);
 
@@ -48,15 +48,15 @@ export default class Game {
     async promptForVotes(idOrder) {
         let count = 1;
         let result = await new Promise((resolve) => {
-            const result = {};
-            this.lobby.playerList.forEach(p => p.socket.emit("vote"));
-            this.lobby.playerList.forEach(p => p.socket.on("vote", (v) => {
+            const result  ={};
+            this.lobby.playerList.forEach(p => p.emit("startVote"));
+            this.lobby.playerList.forEach(p => p.on("vote", (v) => {
                 if (v !== 1 && v !== 2)
                     return;
-                p.socket.emit("voteConfirm");
+                this.lobby.playerList.forEach(p => p.emit("vote"));
                 let index = idOrder.indexOf(p.id);
                 result[index] = v;
-                if (count == idOrder.length)
+                if (count === idOrder.length)
                     resolve(result);
                 count++;
             }))
@@ -69,12 +69,12 @@ export default class Game {
         return Object.values(this.gamePlayers);
     }
 
-
-    gameLoop(){
+    async gameLoop(){
         // Prompt every individual in the collection of players for their "answer"
 
         // Shuffle the players so they are in a random order
         let playerList = this.lobby.playerList.randomize();
+        let idList = playerList.map(p => p.id);
 
         let tempWinner = playerList[0];
         for (let i = 1; i < playerList.length; i++) { //this loop intentionally runs one shorter
@@ -85,43 +85,50 @@ export default class Game {
             let redVoters = [redLeader];
             openChat(); //<- doesn't exist, but basically this is when we want players to be able to start discussing
             this.lobby.startTimer(3);
-            let votesByIndex = this.promptForVotes(playerList.map(p => p.id));
+            let votesByIndex = await this.promptForVotes(idList);
             for (let i = 0; i<votesByIndex.length; i++) {
                 if (votesByIndex[i] === 1)
-                    blueVoters.push(this.playerLobby.playerList[i]);
+                    blueVoters.push(playerList[i]);
                 else if (votesByIndex[i] === 2)
-                    redVoters.push(this.playerLobby.playerList[i]);
+                    redVoters.push(playerList[i]);
             }
             if (blueVoters.length === redVoters.length) {
                 // tie breaker round!
                 blueVoters = [blueLeader];
                 redVoters = [redLeader];
                 // let everyone know this is a tie breaker!
-                this.promptForVotes();
+                votesByIndex = await this.promptForVotes(idList);
+                for (let i = 0; i<votesByIndex.length; i++) {
+                    if (votesByIndex[i] === 1)
+                        blueVoters.push(playerList[i]);
+                    else if (votesByIndex[i] === 2)
+                        redVoters.push(playerList[i]);
+                }
                 // if it's a tie again, then we pick randomly
                 if (blueVoters.length === redVoters.length) {
                     if (Math.floor(Math.random() * 2) === 1) {
                         //handling red team winning
                         tempWinner = redLeader;
-                    } else {
-                        //handling blue team winning
-
-                    }
 
                 }
             }
             if (redVoters.length > blueVoters.length) {
                 //handling red team winning
                 tempWinner = redLeader;
-            } else {
-                //handling blue team winning
+            }
 
             } //theres more for both of those above handles, but this is the framework for a game
 
+            // eslint-disable-next-line no-loop-func
+            this.lobby.playerList.forEach(p => p.emit('roundEnd', tempWinner.id));
+            //theres more for both of those above handles, but this is the framework for a game
         }
-        if (prompt('Drop in a y if you\'d like to play again')=='y'){
-            this.gameLoop();
-        }
+        this.lobby.playerList.forEach(p => p.emit('gameEnd', tempWinner.id, this.lobby.host.id));
+        this.lobby.host.on('replay', (bool) => {
+            if (bool) {
+                this.gameLoop();
+            }
+        })
     }
 }
 
@@ -187,4 +194,5 @@ function randomize(){
     return final;
 }
 
+// eslint-disable-next-line no-extend-native
 Array.prototype.randomize = randomize;

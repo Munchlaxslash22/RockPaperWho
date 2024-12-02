@@ -1,5 +1,5 @@
 import "./App.css";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {socket, clientID} from "./intitateConnection";
 import Lobby from "./comp/Lobby";
 import Chat from "./comp/Chat";
@@ -36,15 +36,18 @@ let currentProps = {};
 
 function App() {
     const [state, setState] = useState("login");
+    useEffect(() => {
+        socket.on('lobby', (lobby) => {
+            if (lobby.state) {
+                openLobby(lobby);
+                setState("lobby");
+            } else {
+                console.log(lobby.message);
+            }
+        })
+    }, [setState]);
 
-   socket.on('lobby', (lobby) => {
-        if (lobby.state) {
-		openLobby(lobby);
-		setState("lobby");
-        } else {
-            console.log(lobby.message);
-        }
-    })
+   
  
   return (
       <div className="App-header">
