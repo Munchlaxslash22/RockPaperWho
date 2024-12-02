@@ -3,12 +3,8 @@ export default class Player {
     constructor(id, socket) {
         this.name = "";
         this.id = id;
-        this.isHost = false;
         this.prompt = "";
-        this.vote = null;
         this.isReady = false;
-        this.isOut = false;
-        this.voteCount = 0;
 		this.lobby = undefined;
         this.currentSocket = socket;
     }
@@ -27,14 +23,13 @@ export default class Player {
 		delete this.lobby
     }
 
-    requestVote(myVote){
-        //prompt the player for their vote and then set it
-
-        this.vote(myVote);
-    }
-
     readyUp(){
         //set this player's ready state
         this.isReady = true;
+    }
+
+    readyDown(){
+        //reset this player's ready state
+        this.isReady = false;
     }
 }

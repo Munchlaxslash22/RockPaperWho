@@ -1,6 +1,7 @@
 
 function openChat() {
     //Doesn't do anything yet, but meant to open up the chat menu so that players can speak with eachother
+
 }
 
 export default class Game {
@@ -9,20 +10,11 @@ export default class Game {
 
     constructor(lobby) {
         this.lobby = lobby;
-        this.redTeamPrompt = null;
-        this.blueTeamPrompt = null;
-        this.gameRound = 0;
-        this.gameEnd = 0;         //This is the round that the game ends.
-        this.pageIndex = 0;       //This is the current webpage being displayed
-        //in retrospect, I don't think we need pageIndex or gameEnd.
-        //anyone reading this, leave a tally mark here if you want to rid ourselves of it -> ( // )
-
         this.lobby.playerList.forEach(p => p.socket.on('chat', (msg) => {
             this.lobby.playerList.forEach(p2 => p2.socket.emit('chat', msg));
         }))
         this.gameLoop();
     }
-
 
 
     join(player) {
@@ -33,9 +25,6 @@ export default class Game {
         this.gamePlayers[player.id] = player;
     }
 
-    set pageIndex(index) {
-        this.pageIndex = index;
-    }
 
     async promptForPrompt() {
         const pIDs =[];
@@ -54,6 +43,7 @@ export default class Game {
             }))
         }));
     }
+
 
     async promptForVotes(idOrder) {
         let count = 1;
@@ -74,50 +64,18 @@ export default class Game {
         return Object.values(result); //array of player ids by voted
     }
 
-    clearAllPrompts() {
-        this.redTeamPrompt = null;
-        this.blueTeamPrompt = null;
-    }
-
-    clearTeams() {
-        //Sets vote in the Player class to null.
-        this.lobby.playerList.forEach(player => {
-            player.vote = null;
-        });
-    }
-
-    calculateTurnWinner() {
-        //We need to add something to count wins for each player.
-
-        let maxVotes = 0;
-        let winner = null;
-
-        //Cycles through each player's # of votes
-        this.playerLobby.playerList.forEach(player => {
-            if (player.voteCount > maxVotes) {
-                maxVotes = player.voteCount;    //Stores # of votes if > previous player
-                winner = player;                //and stores player
-            }
-        });
-
-        return winner;
-    }
 
     get playerList () {
         return Object.values(this.gamePlayers);
     }
 
-    goBackToLobby() {
-
-    }
 
     gameLoop(){
         // Prompt every individual in the collection of players for their "answer"
 
         // Shuffle the players so they are in a random order
-
-
         let playerList = this.lobby.playerList.randomize();
+
         let tempWinner = playerList[0];
         for (let i = 1; i < playerList.length; i++) { //this loop intentionally runs one shorter
                                                                             //than typical!!
@@ -134,12 +92,10 @@ export default class Game {
                 else if (votesByIndex[i] === 2)
                     redVoters.push(this.playerLobby.playerList[i]);
             }
-
             if (blueVoters.length === redVoters.length) {
                 // tie breaker round!
                 blueVoters = [blueLeader];
                 redVoters = [redLeader];
-                this.clearTeams();
                 // let everyone know this is a tie breaker!
                 this.promptForVotes();
                 // if it's a tie again, then we pick randomly

@@ -8,8 +8,7 @@ export default class Lobby {
 		this.host = player;
 		player.joinLobby(this);
 
-
-	// Contains Player objects
+	    // Contains Player objects
         this.playerList = [player];
         this.inactivePlayers = [];
 
@@ -18,9 +17,11 @@ export default class Lobby {
         setInterval(this.sweepPlayers, 600000);
     }
 
+
 	allSockets() {
 		return this.playerList.map(p => p.currentSocket);
 	}
+
 
     playerJoin(player) {
         if (this.playerList.length < 7) {
@@ -31,11 +32,13 @@ export default class Lobby {
         return false;
     }
 
+
 	playerLeaves(playerId)
 	{
 		let listWithOut = this.playerList.map(p => p.id).filter(id => id !== playerId).map(id => this.playerList[id]);
 		this.playerList = listWithOut;
 	}
+
 
     kickPlayer(playerId) {
         if (playerId in this.playerList.map(p => p.id)) {
@@ -46,6 +49,7 @@ export default class Lobby {
         return false;
     }
 
+
     sweepPlayers() {
 		this.inactivePlayers.forEach(p => this.kickPlayer(p.id));
     }
@@ -55,6 +59,7 @@ export default class Lobby {
     setHost(player) {
         this.host = player;
     }
+
 
     //starts the game (currently pseudocode)
     startGame(playerList) {
@@ -68,6 +73,7 @@ export default class Lobby {
         //integrate with front end
     }
 
+
     generateLobbyCode() {
         let lobbyCode = Math.floor(Math.random() * 655536).toString(16); 
         //generates unique lobby code
@@ -76,6 +82,7 @@ export default class Lobby {
         }
         return lobbyCode;
     }
+
 
     //function to start the timer
     startTimer(startTimeInMinutes) {
@@ -93,6 +100,8 @@ export default class Lobby {
             }
         }, 1000);
     }
+
+
     //function to update the timer display
     updateTimer(timeInSeconds) {
         const minutes = Math.floor(timeInSeconds / 60).toString();
@@ -105,6 +114,7 @@ export default class Lobby {
         })
         // countdownElement.innerHTML = `${minutes}: ${seconds}`;
     }
+
 
     close() {
 
