@@ -51,7 +51,7 @@ function App() {
  
   return (
       <div className="App-header">
-          <div id="center">
+          <div>
               <h4>Test buttons</h4>
               <div>
               <button onClick={() => setState("login")}>Login</button>
@@ -61,7 +61,7 @@ function App() {
 
               </div>
           </div>
-          <div id="center">
+          <div>
           <Current state={state} setState={setState}/>
           </div>
       </div>
@@ -106,7 +106,7 @@ function Login() {
 
 
 
-    return (<>
+    return (<div className={"block"}>
         <form onSubmit={(e) => e.preventDefault()}>
             <label aria-label={"name"} htmlFor={"name"}>name</label>:&nbsp;
             <input ref={nameRef} name={"name"} form={"text"}/>&nbsp;&nbsp;
@@ -116,7 +116,7 @@ function Login() {
             <button onClick={join}>Join</button> <button onClick={openLobby}>Create</button>
         </form>
         <p>{process.env.REACT_APP_SERVER_URL}</p>
-        </>)
+        </div>)
 }
 
 

@@ -44,6 +44,10 @@ io.on('connection', (socket) => {
             console.log("New user created: " + id);
         }
 
+        socket.on('chat', (msg) => {
+            socket.emit('chat', msg, "you");
+        })
+
         socket.on('ready', () => {
             pl.readyUp();
         });

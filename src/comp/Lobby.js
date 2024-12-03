@@ -1,4 +1,4 @@
-import {socket, clientID} from "../intitateConnection";
+import {socket} from "../intitateConnection";
 import * as React from "react";
 import {memo, useState, useEffect} from "react";
 
@@ -28,10 +28,10 @@ const Lobby = memo(function({roomCode, players, setState}){
 		socket.on('gameStart', () => {
 			setState('game');
 		})
-	}, [setPlayers]);
+	}, [setPlayers, setState]);
 
 
-    return (<div>
+    return (<div className={"block"}>
 	    <p>{test}</p>
         <p>Room Code: {roomCode}</p>
 

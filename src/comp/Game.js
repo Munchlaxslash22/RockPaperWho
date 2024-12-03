@@ -1,4 +1,4 @@
-import {memo, useEffect, useState} from "react";
+import {memo, useEffect, useRef, useState} from "react";
 import Chat from "./Chat";
 import {socket} from "../intitateConnection";
 import style from "./Game.module.css";
@@ -6,41 +6,50 @@ import style from "./Game.module.css";
 
 
 const Game = memo(({players}) => {
-    const [visibility, revealPrompt] = useState("none");
+    const [isPrompt, prompt] = useState(false);
     useEffect(() => {
         socket.on('prompt', () => {
-            revealPrompt("block");
+            prompt(true);
         })
-    });
+    }, [prompt]);
 
 
-    return (
-        <div className={style.gameWrapper}>
-            <Prompt vis={visibility} set={revealPrompt} />
-            <div>
-                <Timer/>
-                <button onClick={() => revealPrompt('block')}>revealPrompt</button>
-            <Chat players={players}/>
-            </div>
-            <Leaderboard/>
-        </div>
+    return (isPrompt ? <Prompt set={prompt}/> : (
+                <div className={style.gameWrapper + " block"}>
+                    <div>
+                        <Timer/>
+                        <button onClick={() => {
+                            prompt(true);
+                        }}>revealPrompt</button>
+                        <Chat players={players}/>
+                    </div>
+                    <Leaderboard/>
+                </div>
+            )
+
     )
 });
 
-function Prompt({vis, set}) {
+
+
+function Prompt({set}) {
     const [text, setText] = useState('');
-    return (
-        <div style={{
-            display: vis
-        }} className={style.form}>
+    const inpRef = useRef();
+    useEffect(() => {
+        inpRef.current.focus();
+    }, []);
+
+    return (<>
+        <div className={"block"}></div>
+        <div className={style.form}>
             <form onSubmit={(e) => {
-            set("none");
-            setText('');
+            set(false);
             e.preventDefault();
         }}>
-                <input type={"text"} value={text} onChange={(e) => setText(e.target.value)}/>
+                <input ref={inpRef} type={"text"} value={text} onChange={(e) => setText(e.target.value)}/>
             </form>
         </div>
+        </>
             );
 }
 

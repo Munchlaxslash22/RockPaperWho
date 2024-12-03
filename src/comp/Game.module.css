@@ -7,29 +7,27 @@
 }
 
 .form {
-    position: absolute;
     height: 100px;
     width: 500px;
-    top: 50%;
-    left: 50%;
     clip-path: margin-box;
-    transform: translate(-50%, -50%);
     & > form {
           box-sizing: border-box;
           height: inherit;
           width: inherit;
+        resize: vertical;
             & > input {
-                  box-sizing: border-box;
-                  background-color: darkgray;
-                  border: gray 10px solid;
-                  border-radius: 20px 20px 20px 20px;
-                    color: lightgrey;
-                  display: block;
-                  height: 100%;
-                  width: 100%;
-                  padding: 10px;
-                  font-size: 100%;
-                    outline: none;
+                text-align: center;
+                box-sizing: border-box;
+                background-color: darkgray;
+                border: gray 10px solid;
+                border-radius: 20px 20px 20px 20px;
+                color: lightgrey;
+                display: block;
+                height: 100%;
+                width: 100%;
+                padding: 10px;
+                font-size: 10cqmin;
+                outline: none;
 
                 &:focus, &:hover {
                     color: darkslategray;

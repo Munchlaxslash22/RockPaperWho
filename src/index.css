@@ -7,20 +7,3 @@ code {
     monospace;
 }
 
-#center {
-    color: black;
-    border-radius: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    margin: 20px;
-    box-sizing: border-box;
-    background:
-            linear-gradient(whitesmoke, whitesmoke) padding-box,
-            linear-gradient(to top, yellow, blue) border-box;
-    border: 5px solid transparent;
-}
-
