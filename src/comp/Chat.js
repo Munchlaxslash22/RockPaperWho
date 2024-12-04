@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import enterButtonImage from "../.resources/Enter_Button.jpg";
 import pressedButtonIMG from "../.resources/Enter_Button_Pressed.jpg";
 import {socket} from "../intitateConnection";
+import style from "./Game.module.css";
 
 const AlwaysScrollToBottom = () => {
     const elementRef = useRef();
@@ -37,19 +38,9 @@ export default function Chat({lobby, players}) {
 
     return (
         <div>
-            <div style={{
-                overflow: "scroll",
-                boxSizing: "border-box",
-                backgroundColor: "lightgray",
-                height: "60vh",
-                width: "30vw",
-                margin: "10px auto",
-                border: "5px black solid",
-                borderRadius: "15px",
-                resize: "none"
-            }}>
+            <div className={style.chat}>
                 {ChatMessages.split('\n').map((l, i) => <div style={{
-                    backgroundColor: i % 2 === 0 ? "white" : "#eee",
+                    backgroundColor: i % 2 === 0 ? "white" : "#f5f5f5",
                     textAlign: "start",
                     fontSize: "16px",
                     padding: "4px",
@@ -60,18 +51,9 @@ export default function Chat({lobby, players}) {
 
 
             <form onSubmit={chat}>
-                <input value={msg} onChange={e => setMsg(e.target.value)}
+                <input className={style.chatPrompt} value={msg} onChange={e => setMsg(e.target.value)}
                        placeholder={"Type words"} autoFocus={true}>
-                </input><img src={img} style={{
-                    width : "50px",
-                    verticalAlign: "middle"
-            }}  onClick={function (e) {
-                    chat(e);
-                    setImg(pressedButtonIMG);
-                    setTimeout(() => {
-                        setImg(enterButtonImage)
-                    }, 500);
-                }} id={"chatButton"} alt={"Enter"}/>
+                </input><button className={style.chatButton} aria-label={"Enter"}/>
             </form>
         </div>
     )

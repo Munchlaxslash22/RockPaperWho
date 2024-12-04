@@ -23,8 +23,34 @@
   text-align: center;
 }
 
+/*.block {
+  display: block;
+  color: black;
+  border-radius: 50px;
+  padding: 20px;
+  margin: 20px;
+  box-sizing: border-box;
+  background:
+          linear-gradient(whitesmoke, whitesmoke) padding-box,
+          linear-gradient(to top, yellow, blue) border-box;
+  border: 5px solid transparent;
+}*/
+
 .block {
   display: block;
+  color: black;
+  padding: 20px;
+  margin: 20px;
+  box-sizing: border-box;
+  background-color: whitesmoke;
+  clip-path: xywh(0px 0px 100% 100% round 20px 20px);
+  border-width: 10px 0 0 10px;
+  border-color: lightgray;
+  border-style: solid;
+}
+
+
+.inline {
   color: black;
   border-radius: 50px;
   padding: 20px;

@@ -1,4 +1,7 @@
 .gameWrapper {
+    box-sizing: margin-box;
+    place-content: center;
+    width: 40vw;
     display: flex;
     flex-direction: row;
     & * {
@@ -6,7 +9,7 @@
     }
 }
 
-.form {
+.prompt {
     height: 100px;
     width: 500px;
     clip-path: margin-box;
@@ -36,4 +39,43 @@
                  }
               }
       }
+}
+
+.chat {
+    overflow: scroll;
+    box-sizing: border-box;
+    background-color: white;
+    height: 60vh;
+    width: 30vw;
+    margin: 10px auto;
+    resize: none;
+    clip-path: xywh(0px 0px 100% 100% round 20px 20px);
+    border-width: 10px 0 0 10px;
+    border-color: #e5e5e5;
+    border-style: solid;
+}
+
+.chatPrompt {
+    box-sizing: border-box;
+    background-color: white;
+    clip-path: xywh(0px 0px 100% 100% round 5px 5px);
+    border-width: 7px 0 0 7px;
+    border-color: #e5e5e5;
+    border-style: solid;
+    outline: none;
+    margin-right: 5px;
+    vertical-align: top;
+    height: calc(292px * 0.1);
+}
+.chatButton {
+    background-image: url("../.resources/Enter_Button.jpg");
+    background-size: 100% 100%;
+    border: none;
+    height: calc(292px * 0.1);
+    width: calc(542px * 0.1);
+    vertical-align: center;
+
+    &:active {
+        background-image: url("../.resources/Enter_Button_Pressed.jpg");
+    }
 }

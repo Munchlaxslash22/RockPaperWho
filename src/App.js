@@ -34,7 +34,12 @@ function conditionalRender() {
 let Current = conditionalRender();
 let currentProps = {};
 
+
+
+
 function App() {
+
+
     const [state, setState] = useState("login");
     useEffect(() => {
         socket.on('lobby', (lobby) => {
@@ -47,7 +52,6 @@ function App() {
         })
     }, [setState]);
 
-   
  
   return (
       <div className="App-header">
@@ -56,14 +60,19 @@ function App() {
               <div>
               <button onClick={() => setState("login")}>Login</button>
               <button onClick={() => setState("chat")}>Chat</button>
-              <button onClick={() => setState("lobby")}>Lobby</button>
+              <button onClick={() => {
+                  openLobby({
+                      names: ["test", "test2", "test3"],
+                      ids: ["5df2", "21ef", "22ec"],
+                      roomCode: "2cfe"
+                  })
+                  setState('lobby');
+              }}>Lobby</button>
               <button onClick={() => setState("game")}>Game</button>
 
               </div>
           </div>
-          <div>
           <Current state={state} setState={setState}/>
-          </div>
       </div>
   );
 }

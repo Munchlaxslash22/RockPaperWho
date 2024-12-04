@@ -1,6 +1,7 @@
 import {socket} from "../intitateConnection";
 import * as React from "react";
 import {memo, useState, useEffect} from "react";
+import Game from "./Game";
 
 
 //
@@ -10,6 +11,7 @@ import {memo, useState, useEffect} from "react";
 
 const Lobby = memo(function({roomCode, players, setState}){
 	const [activePlayers, setPlayers] = useState(players);
+	const [game, setGame] = useState(false);
 	const [test, setTest] = useState("");
 	useEffect(() => {
 		socket.on('join', (id, name) => {
@@ -26,17 +28,21 @@ const Lobby = memo(function({roomCode, players, setState}){
 			});
 		});
 		socket.on('gameStart', () => {
-			setState('game');
+			setGame(true);
 		})
 	}, [setPlayers, setState]);
 
+
+	if (game) {
+		return <Game players={activePlayers} unload={() => setGame(true)}/>
+	}
 
     return (<div className={"block"}>
 	    <p>{test}</p>
         <p>Room Code: {roomCode}</p>
 
         {Object.values(activePlayers).map(playerName => <p>{playerName}</p>)}
-	    <button>Start Game</button>
+	    <button onClick={() => setGame(true)}>Start Game</button>
     </div>);
 });
 
