@@ -52,6 +52,7 @@ const Game = memo(({players, unload}) => {
                     <ActivePrompt vote={vote}/>
                     <Timer/>
                     <button onClick={() => socket.emit('breakPrompts')}>BREAK PROMPTS</button>
+                    <button onClick={() => socket.emit('breakRound')}>BREAK ROUND</button>
                     {/*<button onClick={() => {
                         prompt(true);
                     }}>revealPrompt</button>*/}
@@ -89,11 +90,22 @@ function Voter({vote, setVote}) {
 }
 
 function ActivePrompt ({vote}) {
+    const [red, setRed] = useState("Undefined");
+    const [blue, setBlue] = useState("Undefined");
+    useEffect(() => {
+        socket.on('round', (redPrompt, bluePrompt) => {
+            setRed(redPrompt);
+            setBlue(bluePrompt);
+        });
+
+        return () => socket.removeEvents('round');
+    }, []);
+
     return (
         <div>
-            <span style={{color: "red", textDecoration: (vote === 1 ? "underline" : "none")}}>TEST</span><br/>
+            <span style={{color: "red", textDecoration: (vote === 1 ? "underline" : "none")}}>{red}</span><br/>
             vs<br/>
-            <span style={{color: "blue", textDecoration: (vote === 2 ? "underline" : "none")}}>TEST</span>
+            <span style={{color: "blue", textDecoration: (vote === 2 ? "underline" : "none")}}>{blue}</span>
         </div>
     )
 }

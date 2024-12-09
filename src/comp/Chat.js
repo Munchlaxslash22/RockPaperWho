@@ -21,10 +21,10 @@ const AlwaysScrollToBottom = () => {
 };
 
 
+let i = 0;
 let CurrentChat = function ({players, setMsg}) {
     const [chatMessages, setChatMessages] = useState([]);
     useEffect(() => {
-        let i = 0;
         socket.on('chat', (msg, id) => {
             console.log(players);
             let pl = players[id];

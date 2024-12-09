@@ -16,7 +16,7 @@ export default class Lobby {
 
         this.roomCode = this.generateLobbyCode();
         Lobby.lobbyList[this.roomCode] = this;
-        setInterval(this.sweepPlayers, 600000);
+        // setInterval(this.sweepPlayers, 600000);
         this.host.on('setupGame', () => {this.startGame()});
     }
 
@@ -100,7 +100,7 @@ export default class Lobby {
     }
 
 
-    //function to start the timer
+    //function to start the timer, returns function to turn off
     startTimer(startTimeInMinutes) {
 
         //turns the minutes into countable seconds
@@ -115,6 +115,7 @@ export default class Lobby {
                 clearInterval(interval);
             }
         }, 1000);
+        return () => clearInterval(interval);
     }
 
 

@@ -1,8 +1,30 @@
+import fs from "fs";
+
+// eslint-disable-next-line no-extend-native
+Array.prototype.randomize = function (){
+    let temp = this.slice();
+    let final = [];
+    for (let i = 0; i < this.length; i++){
+        const r = Math.random() * temp.length;
+        const y = Math.floor(r)
+        let x = temp[y];
+        final.push(x);
+        temp =  temp.filter((p) => p !== x);
+    }
+    return final;
+}
+
+// eslint-disable-next-line no-extend-native
+Array.prototype.random = function () {
+    return this[Math.floor(Math.random() * this.length)];
+}
 
 function openChat() {
     //Doesn't do anything yet, but meant to open up the chat menu so that players can speak with eachother
 
 }
+
+let randomPrompts = fs.readFileSync('./backend/randomAnswers.txt', {encoding: "utf-8"}).split('\n').randomize();
 
 export default class Game {
 
@@ -11,6 +33,7 @@ export default class Game {
         console.log(this);
         console.log("Game created by lobby " + this.lobby.roomCode);
     }
+
 
 
     async promptForPrompt() {
@@ -28,6 +51,11 @@ export default class Game {
                     resolve();
             });
             this.lobby.host.on('breakPrompts', () => {
+                this.lobby.playerList.forEach(p => {
+                    if (!p.prompt) {
+                        p.prompt = randomPrompts.random();
+                    }
+                })
                 resolve();
             });
         });
@@ -35,9 +63,9 @@ export default class Game {
     }
 
 
-    async promptForVotes(idOrder) {
-
+    async promptForVotes(idOrder, endTimer) {
         let count = 1;
+
         let result = await new Promise((resolve) => {
             const result  ={};
             this.emitAllPlayer("startVote");
@@ -49,11 +77,14 @@ export default class Game {
                     return;
                 this.emitAllPlayer("vote", p.id, v);
                 result[index] = v;
-                if (count === idOrder.length)
+                if (count === idOrder.length) {
+                    endTimer();
                     resolve(result);
+                }
                 count++;
             });
             this.lobby.host.on('breakRound', () => {
+                endTimer();
                 resolve(result);
             })
         })
@@ -76,8 +107,9 @@ export default class Game {
             let redLeader = playerList[i];
             let blueVoters = [blueLeader];
             let redVoters = [redLeader];
-            this.lobby.startTimer(3);
-            let votesByIndex = await this.promptForVotes(idList);
+            this.emitAllPlayer('round', redLeader.prompt, blueLeader.prompt);
+            let endTimer = this.lobby.startTimer(3);
+            let votesByIndex = await this.promptForVotes(idList, endTimer);
             for (let i = 0; i<votesByIndex.length; i++) {
                 if (votesByIndex[i] === 1)
                     blueVoters.push(playerList[i]);
@@ -89,7 +121,9 @@ export default class Game {
                 blueVoters = [blueLeader];
                 redVoters = [redLeader];
                 // let everyone know this is a tie breaker!
-                votesByIndex = await this.promptForVotes(idList);
+                this.emitAllPlayer('tie');
+                let tieTimer = this.lobby.startTimer(1);
+                votesByIndex = await this.promptForVotes(idList, tieTimer);
                 for (let i = 0; i<votesByIndex.length; i++) {
                     if (votesByIndex[i] === 1)
                         blueVoters.push(playerList[i]);
@@ -138,7 +172,7 @@ export default class Game {
 
     removeAllEvents(...ev) {
         ev.forEach(e => {
-            this.lobby.playerList.forEach(p => p.socket.removeListener(e));
+            this.lobby.playerList.forEach(p => p.removeEvents(e));
         })
     }
 
@@ -193,18 +227,7 @@ export function prompt(msg) {
     })
 }
 
-function randomize(){
-    let temp = this.slice();
-    let final = [];
-    for (let i = 0; i < this.length; i++){
-        const r = Math.random() * temp.length;
-        const y = Math.floor(r)
-        let x = temp[y];
-        final.push(x);
-        temp =  temp.filter((p) => p !== x);
-    }
-    return final;
-}
 
-// eslint-disable-next-line no-extend-native
-Array.prototype.randomize = randomize;
+
+
+
