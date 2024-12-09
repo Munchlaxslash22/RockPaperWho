@@ -1,6 +1,12 @@
+.background1 {
+  background-color: aliceblue;
+}
+.background2 {
+  background-color: red;
+}
+
 .App-header {
   text-align: center;
-  background-color: aliceblue;
   background-image: url("./.resources/bg.png");
   background-repeat: repeat;
   background-blend-mode: multiply;

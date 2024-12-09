@@ -5,8 +5,8 @@ let url;
 if (process.env.REACT_APP_SERVER_URL)
     url = process.env.REACT_APP_SERVER_URL;
 else
-    url = "http://localhost:8888/"
-
+    url = "http://" + window.location.hostname + ":8888";
+console.log(url);
 
 const s = io(url);
 
@@ -20,7 +20,7 @@ id = await getID;
 Cookies.set("id", id);
 
 s.removeEvents = function (...ev) {
-    ev.forEach(e => this.removeListener(e))
+    ev.forEach(e => this.removeAllListeners(e))
 };
 export const socket = s;
 export const clientID = id;

@@ -22,6 +22,7 @@ const Game = memo(({players, unload}) => {
             prompt(true);
         })
         socket.on('vote', (id, vote) => {
+            console.log(id, vote);
             setPlObj(obj => {
                 obj[id].vote = vote;
                 return {...obj};
@@ -50,6 +51,7 @@ const Game = memo(({players, unload}) => {
                 <div>
                     <ActivePrompt vote={vote}/>
                     <Timer/>
+                    <button onClick={() => socket.emit('breakPrompts')}>BREAK PROMPTS</button>
                     {/*<button onClick={() => {
                         prompt(true);
                     }}>revealPrompt</button>*/}
@@ -145,11 +147,11 @@ function Leaderboard({players}) {
         socket.on('vote', (id, vote) => {
             if (id in red)
                 setRed(arr => {
-                    return arr.filter(a => a != id)
+                    return arr.filter(a => a !== id)
                 });
             else if (id in blue)
                 setBlue(arr => {
-                    return arr.filter(a => a != id)
+                    return arr.filter(a => a !== id)
                 });
 
             if (vote === 1)

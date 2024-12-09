@@ -6,9 +6,9 @@ export default class Lobby {
     static lobbyList = {};
     activeGame;
     constructor(player) {
-		this.host = player;
+        this.host = player;
         this.activeGame = null;
-		player.joinLobby(this);
+        player.joinLobby(this);
 
 	    // Contains Player objects
         this.playerList = [player];
@@ -29,8 +29,8 @@ export default class Lobby {
     playerJoin(player) {
         if (this.playerList.length < 8) {
             this.playerList.push(player);
-			this.allSockets().forEach(s => s.emit("join", player.id, player.name));
-            return true;
+			  this.playerList.forEach(p => p.emit("join", player.id, player.name));
+        return true;
         }
         return false;
     }
@@ -55,8 +55,8 @@ export default class Lobby {
 
     kickPlayer(playerId) {
         if (playerId in this.playerList.map(p => p.id)) {
-			this.playerLeaves(playerId);
-					this.allSockets().forEach(s => s.emit("left", playerId));
+            this.playerLeaves(playerId);
+            this.playerList.forEach(p => p.emit("left", playerId));
             return true;
         }
         return false;
@@ -66,7 +66,8 @@ export default class Lobby {
     sweepPlayers() {
         if (this.activeGame)
             return;
-		this.inactivePlayers.forEach(p => this.kickPlayer(p.id));
+        if (this.inactivePlayers.length !== 0)
+        this.inactivePlayers.forEach(p => this.kickPlayer(p.id));
     }
 
 
@@ -81,7 +82,7 @@ export default class Lobby {
         //if isReady in playerList is all true, prompt host to start game
         if (this.playerList.every(player => player.isReady === true)) {
             this.activeGame = new Game(this);
-            this.allSockets().forEach(s => s.emit('game'));
+            this.activeGame.emitAllPlayer('game');
             this.host.on('gameStart', () => this.activeGame.gameLoop());
         } else
             console.log("Players not all ready");

@@ -8,7 +8,6 @@ export default class Game {
 
     constructor(lobby) {
         this.lobby = lobby;
-        this.onAllPlayer('chat', (p, msg) => p.emit('chat', msg));
         console.log(this);
         console.log("Game created by lobby " + this.lobby.roomCode);
     }
@@ -32,6 +31,7 @@ export default class Game {
                 resolve();
             });
         });
+        this.removeAllEvents("prompt", "breakPrompts","editPrompt")
     }
 
 
@@ -57,8 +57,7 @@ export default class Game {
                 resolve(result);
             })
         })
-        this.lobby.host.socket.removeListener('breakRound');
-        this.removeAllEvents("vote");
+        this.removeAllEvents("vote", "breakRound");
         return Object.values(result); //array of player ids by voted
     }
 
@@ -68,6 +67,7 @@ export default class Game {
         let playerList = this.lobby.playerList.randomize();
         let idList = playerList.map(p => p.id);
 
+        this.onAllPlayer('chat', (p, msg) => this.emitAllPlayer('chat', msg, p.id));
         await this.promptForPrompt();
         let tempWinner = playerList[0];
         for (let i = 1; i < playerList.length; i++) { //this loop intentionally runs one shorter
@@ -126,7 +126,7 @@ export default class Game {
     // f = (p) => return [...args]
     emitAllPlayer(msg, ...f) {
         if (f[0] instanceof Function)
-            this.lobby.playerList.forEach(p => p.emit(msg, ...f[0](p)));
+            this.lobby.playerList.forEach(p => p.emit(msg, ...(f[0](p))));
         else
             this.lobby.playerList.forEach(p => p.emit(msg, ...f));
     }

@@ -2,17 +2,31 @@ import {useEffect, useRef, useState} from "react";
 import {clientID, socket} from "../intitateConnection";
 import style from "./Game.module.css";
 
+function doOnce (thing) {
+let bool = false;
+
+    return function () {
+        if (!bool) {
+            bool = true;
+            return this
+        }
+    }.bind(thing);
+
+}
+
 const AlwaysScrollToBottom = () => {
     const elementRef = useRef();
     useEffect(() => elementRef.current.scrollIntoView());
     return <div ref={elementRef} />;
 };
 
+
 let CurrentChat = function ({players, setMsg}) {
     const [chatMessages, setChatMessages] = useState([]);
     useEffect(() => {
         let i = 0;
         socket.on('chat', (msg, id) => {
+            console.log(players);
             let pl = players[id];
             if (pl) {
                 setChatMessages(arr => {
@@ -35,9 +49,9 @@ let CurrentChat = function ({players, setMsg}) {
             setMsg('');
         })
         return () => {
-            socket.removeEvents("resetChat", "chat");
+            socket.removeEvents("chat", "resetChat");
         }
-    }, [players, setMsg]);
+    }, [players, setMsg, setChatMessages]);
 
     return (<div className={style.chat}>
         <>
@@ -56,6 +70,7 @@ export default function Chat({players}) {
         e.preventDefault();
         if (msg.trim() === "") return;
         // sends message
+        console.log(msg);
         socket.emit('chat', msg);
         setMsg('');
     }

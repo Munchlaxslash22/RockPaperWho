@@ -47,7 +47,7 @@ const Lobby = memo(function({roomCode, players, setState}){
 		<button onClick={() => socket.emit('test')}>test button</button>
         <p>Room Code: {roomCode}</p>
 
-        {Object.values(activePlayers).map(playerName => <p key={crypto.randomUUID()}>{playerName}</p>)}
+			{Object.values(activePlayers).map(playerName => <p>{playerName}</p>)}
 	    <button onClick={setupGame}>Start Game</button>
     </div>);
 });

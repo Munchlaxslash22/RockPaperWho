@@ -18,6 +18,7 @@ export default class Player {
 
     on(msg, func) {
         if (this.socket) {
+            this.socket.removeAllListeners(msg);
             this.socket.on(msg, func);
         }
     }
@@ -28,7 +29,7 @@ export default class Player {
         }
     }
 
-    disconnect(id) {
+    disconnect() {
         this.socket = null;
         if (this.lobby){
             this.lobby.playerDisconnects(this.id);

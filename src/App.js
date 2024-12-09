@@ -57,17 +57,21 @@ function App() {
 
  
   return (
-      <div className="App-header">
-          <div>
-              <button onClick={() => setState("login")}>Login</button>
-              <button onClick={() => setState("chat")}>Chat</button>
-              <button onClick={() => {
-                  socket.emit("startLobby", "test");
-              }}>Lobby</button>
-              <button onClick={() => setState("game")}>Game</button>
+      <div className="background1">
+          <div className="background2">
+              <div className="App-header">
+                  <div>
+                      <button onClick={() => setState("login")}>Login</button>
+                      <button onClick={() => setState("chat")}>Chat</button>
+                      <button onClick={() => {
+                          socket.emit("startLobby", "test");
+                      }}>Lobby</button>
+                      <button onClick={() => setState("game")}>Game</button>
+                  </div>
+                  <Current state={state} setState={setState}/>
+              </div>
+              </div>
           </div>
-          <Current state={state} setState={setState}/>
-      </div>
   );
 }
 
