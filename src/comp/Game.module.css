@@ -79,3 +79,39 @@
         background-image: url("../.resources/Enter_Button_Pressed.jpg");
     }
 }
+
+.vote {
+    display: block;
+    height: 50px;
+    width: 50px;
+    margin: 5px;
+    border : none;
+    border-radius: 0;
+    color: white;
+    font-family: Courier, sans-serif;
+    font-size: 10px;
+    clip-path: xywh(0px 0px 100% 100% round 20px 20px);
+    &.red {
+        border-width: 0 10px 10px 0;
+        border-color: lightpink;
+        border-style: solid;
+        background-color: pink;
+        &.selected {
+            border-width: 10px 0 0 10px;
+            border-color: deeppink;
+            background-color: hotpink;
+        }
+    }
+
+    &.blue {
+        border-width: 0 10px 10px 0;
+        border-color: powderblue;
+        border-style: solid;
+        background-color: lightblue;
+        &.selected {
+            border-width: 10px 0 0 10px;
+            border-color: deepskyblue;
+            background-color: lightskyblue;
+        }
+    }
+}

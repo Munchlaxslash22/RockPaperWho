@@ -19,5 +19,8 @@ s.emit("setup", id);
 id = await getID;
 Cookies.set("id", id);
 
+s.removeEvents = function (...ev) {
+    ev.forEach(e => this.removeListener(e))
+};
 export const socket = s;
 export const clientID = id;

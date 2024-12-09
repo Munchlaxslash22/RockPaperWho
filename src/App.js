@@ -49,28 +49,22 @@ function App() {
             } else {
                 console.log(lobby.message);
             }
-        })
+        });
+        return () => {
+            socket.removeEvents("lobby");
+        }
     }, [setState]);
 
  
   return (
       <div className="App-header">
           <div>
-              <h4>Test buttons</h4>
-              <div>
               <button onClick={() => setState("login")}>Login</button>
               <button onClick={() => setState("chat")}>Chat</button>
               <button onClick={() => {
-                  openLobby({
-                      names: ["test", "test2", "test3"],
-                      ids: ["5df2", "21ef", "22ec"],
-                      roomCode: "2cfe"
-                  })
-                  setState('lobby');
+                  socket.emit("startLobby", "test");
               }}>Lobby</button>
               <button onClick={() => setState("game")}>Game</button>
-
-              </div>
           </div>
           <Current state={state} setState={setState}/>
       </div>
@@ -78,12 +72,10 @@ function App() {
 }
 
 function openLobby(lobby){
-	let players = {};  
-    console.log(lobby);
+	let players = {};
 	lobby.ids.forEach((id, index) => {
 		players[id] = lobby.names[index];
 	});
-	console.log(players);
 	currentProps.players = players;
 	currentProps.roomCode = lobby.roomCode;
 }

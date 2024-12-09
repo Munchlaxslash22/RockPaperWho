@@ -30,40 +30,20 @@ export const removePlayer = (id) => delete players[id];
 // ON PLAYER CONNECTION
 io.on('connection', (socket) => {
     socket.on('setup', (id) => {
-        let pl;
-        if (players[id]){
-            pl = players[id];
-            pl.reconnect(socket);
-            console.log("User " + id + " reconnected.");
-        }else {
+    let pl;
+    if (players[id]){
+        pl = players[id];
+        console.log("User " + id + " reconnected.");
+    }else {
+        id = Math.floor(Math.random() * 4294967295).toString(16);
+        while (id in getConnectedIDs())
             id = Math.floor(Math.random() * 4294967295).toString(16);
-            while (id in getConnectedIDs())
-                id = Math.floor(Math.random() * 4294967295).toString(16);
-            pl = new Player(id, socket);
-            players[id] = pl;
-            console.log("New user created: " + id);
-        }
+        pl = new Player(id);
+        players[id] = pl;
+        console.log("New user created: " + id);
+    }
 
-        socket.on('chat', (msg) => {
-            socket.emit('chat', msg, "you");
-        })
-
-        socket.on('ready', () => {
-            pl.readyUp();
-        });
-        socket.on('unready', () => {
-            pl.readyDown();
-        });
-
-        socket.emit('setup', id);
-
-        socket.on('disconnect', () => {
-            pl.currentSocket = null;
-            socket.removeAllListeners();
-		if (pl.lobby) {
-		pl.lobby.disconnect();
-		}
-        })
+    pl.connect(socket);
 	    
 	socket.on('startLobby', (name) => {
         pl.name = name;
@@ -74,34 +54,34 @@ io.on('connection', (socket) => {
 			ids: [id],
 			roomCode: lobby.roomCode		});
 		console.log(`User ${name}, initiated lobby: ${lobby.roomCode}`);
-        })
+        });
 
-        socket.on('joinLobby', (roomCode, name) => {
-            pl.name = name;
-            let lobby = Lobby.lobbyList[roomCode];
-            if (lobby){
-                if(lobby.playerJoin(pl)){
-                    socket.emit('lobby', {
-                        state: true,
-                        names: lobby.playerList.map(p => p.name),
-                        ids: lobby.playerList.map(p => p.id),
-                        roomCode: roomCode
-                    });
-                } else {
-                    socket.emit('lobby', {
-                        state: false,
-                        message: "Lobby is full (max 8)"
-                    });
-                }
+    socket.on('joinLobby', (roomCode, name) => {
+        pl.name = name;
+        let lobby = Lobby.lobbyList[roomCode];
+        if (lobby){
+            if(lobby.playerJoin(pl)){
+                socket.emit('lobby', {
+                    state: true,
+                    names: lobby.playerList.map(p => p.name),
+                    ids: lobby.playerList.map(p => p.id),
+                    roomCode: roomCode
+                });
             } else {
                 socket.emit('lobby', {
                     state: false,
-                    message: "Lobby does not exist"
+                    message: "Lobby is full (max 8)"
                 });
             }
-        })
+        } else {
+            socket.emit('lobby', {
+                state: false,
+                message: "Lobby does not exist"
+            });
+        }
+    });
 
-    })
+    });
 
 
     socket.on('disconnect', () => {

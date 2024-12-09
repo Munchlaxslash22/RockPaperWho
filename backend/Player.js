@@ -1,13 +1,14 @@
 export default class Player {
 
-    constructor(id, socket) {
+    constructor(id) {
         this.name = "";
         this.id = id;
         this.prompt = "";
         this.isReady = false;
-		this.lobby = undefined;
-        this.socket = socket;
+		this.lobby = null;
+        this.socket = null;
     }
+
 
     emit(msg, ...arg) {
         if (this.socket) {
@@ -29,10 +30,37 @@ export default class Player {
 
     disconnect(id) {
         this.socket = null;
+        if (this.lobby){
+            this.lobby.playerDisconnects(this.id);
+        }
     }
 
-    reconnect(socket) {
+    connect(socket) {
         this.socket = socket;
+
+        socket.emit('setup', this.id);
+
+        //TEST
+        socket.on('test', () => {
+            for (let i = 0; i < 7; i++) {
+                let player = new Player(i);
+                player.name = "test" + i;
+                this.lobby.playerJoin(player);
+            }
+            this.lobby.playerList.forEach(p => p.readyUp());
+        })
+
+        socket.on('ready', () => {
+            this.readyUp();
+        });
+        socket.on('unready', () => {
+            this.readyDown();
+        });
+
+        socket.on('disconnect', () => {
+            this.disconnect();
+            socket.removeAllListeners();
+        })
     }
 
 	joinLobby(lobby){
@@ -42,7 +70,7 @@ export default class Player {
 
     leaveLobby(){
         //This player is leaving a game
-		delete this.lobby
+		this.lobby = null;
     }
 
     readyUp(){

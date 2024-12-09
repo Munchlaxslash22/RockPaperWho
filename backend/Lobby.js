@@ -17,16 +17,17 @@ export default class Lobby {
         this.roomCode = this.generateLobbyCode();
         Lobby.lobbyList[this.roomCode] = this;
         setInterval(this.sweepPlayers, 600000);
+        this.host.on('setupGame', () => {this.startGame()});
     }
 
 
 	allSockets() {
-		return this.playerList.map(p => p.socket);
+		return this.playerList.map(p => p.socket).filter(s => !!s);
 	}
 
 
     playerJoin(player) {
-        if (this.playerList.length < 7) {
+        if (this.playerList.length < 8) {
             this.playerList.push(player);
 			this.allSockets().forEach(s => s.emit("join", player.id, player.name));
             return true;
@@ -42,6 +43,16 @@ export default class Lobby {
 	}
 
 
+    playerDisconnects(playerId) {
+        for (const p of this.playerList) {
+            if (playerId === p.id) {
+                this.inactivePlayers.push(playerId)
+                return;
+            }
+        }
+    }
+
+
     kickPlayer(playerId) {
         if (playerId in this.playerList.map(p => p.id)) {
 			this.playerLeaves(playerId);
@@ -53,6 +64,8 @@ export default class Lobby {
 
 
     sweepPlayers() {
+        if (this.activeGame)
+            return;
 		this.inactivePlayers.forEach(p => this.kickPlayer(p.id));
     }
 
@@ -64,12 +77,12 @@ export default class Lobby {
 
 
     //starts the game (currently pseudocode)
-    startGame(playerList) {
-        //if isReady in playerlist is all true, prompt host to start game
-        if (playerList.every(player => player.isReady === true)) {
-            let activeGame = new Game(this);
-            this.activeGame = activeGame;
+    startGame() {
+        //if isReady in playerList is all true, prompt host to start game
+        if (this.playerList.every(player => player.isReady === true)) {
+            this.activeGame = new Game(this);
             this.allSockets().forEach(s => s.emit('game'));
+            this.host.on('gameStart', () => this.activeGame.gameLoop());
         } else
             console.log("Players not all ready");
         //integrate with front end

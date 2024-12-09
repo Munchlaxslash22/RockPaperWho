@@ -1,7 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import enterButtonImage from "../.resources/Enter_Button.jpg";
-import pressedButtonIMG from "../.resources/Enter_Button_Pressed.jpg";
-import {socket} from "../intitateConnection";
+import {clientID, socket} from "../intitateConnection";
 import style from "./Game.module.css";
 
 const AlwaysScrollToBottom = () => {
@@ -10,24 +8,50 @@ const AlwaysScrollToBottom = () => {
     return <div ref={elementRef} />;
 };
 
-export default function Chat({lobby, players}) {
-    const [ChatMessages, setChatMessages] = useState('');
-    const [msg, setMsg] = useState('');
-    const [img, setImg] = useState(enterButtonImage);
+let CurrentChat = function ({players, setMsg}) {
+    const [chatMessages, setChatMessages] = useState([]);
     useEffect(() => {
-        socket.on('chat', (msg, name) => {
-            setChatMessages(ChatMessages + `\r\n[${name}] ` + msg);
-            console.log(msg);
-        })
+        let i = 0;
+        socket.on('chat', (msg, id) => {
+            let pl = players[id];
+            if (pl) {
+                setChatMessages(arr => {
+                    arr.push(<div key={i} style={{
+                        backgroundColor: i % 2 === 0 ? "white" : "#f5f5f5",
+                        textAlign: "start",
+                        fontSize: "16px",
+                        padding: "4px",
+                        overflowWrap: "break-word"
+                    }}> <span style={{
+                        color: pl.vote != null ? (pl.vote === 1 ? "red" : "blue") : "black"
+                    }}>[{id === clientID ? "You" : pl.name}]</span>&nbsp;&nbsp;{msg}</div>);
+                    return [...arr];
+                });
+                i++;
+            }
+        });
         socket.on('resetChat', () => {
-            setChatMessages('');
+            setChatMessages([]);
             setMsg('');
         })
-    }, [setChatMessages, msg, ChatMessages]);
+        return () => {
+            socket.removeEvents("resetChat", "chat");
+        }
+    }, [players, setMsg]);
+
+    return (<div className={style.chat}>
+        <>
+        {chatMessages.map((chatMessage) => (<>{chatMessage}</>))}
+        </>
+        <AlwaysScrollToBottom/>
+    </div>)
+};
+
+export default function Chat({players}) {
+    const [msg, setMsg] = useState('');
+
 
     //all messages come from here, and messages sent loop around.
-    
-
     function chat(e) {
         e.preventDefault();
         if (msg.trim() === "") return;
@@ -38,17 +62,7 @@ export default function Chat({lobby, players}) {
 
     return (
         <div>
-            <div className={style.chat}>
-                {ChatMessages.split('\n').map((l, i) => <div style={{
-                    backgroundColor: i % 2 === 0 ? "white" : "#f5f5f5",
-                    textAlign: "start",
-                    fontSize: "16px",
-                    padding: "4px",
-                    overflowWrap: "break-word"
-                }}>{l}</div>)}
-                <AlwaysScrollToBottom/>
-            </div>
-
+            <CurrentChat setMsg={setMsg} players={players}/>
 
             <form onSubmit={chat}>
                 <input className={style.chatPrompt} value={msg} onChange={e => setMsg(e.target.value)}

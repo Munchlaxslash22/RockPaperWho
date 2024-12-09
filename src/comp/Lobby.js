@@ -17,32 +17,38 @@ const Lobby = memo(function({roomCode, players, setState}){
 		socket.on('join', (id, name) => {
 			setTest("test");
 			setPlayers((pl) => {
-				pl[id] = name;
-				return pl;
+				return {...pl, [id] : name};
 			});
 		});
 		socket.on('left', (id) => {
 			setPlayers((pl) => {
 				delete pl[id];
-				return pl;
+				return {...pl};
 			});
 		});
-		socket.on('gameStart', () => {
+		socket.on('game', () => {
 			setGame(true);
 		})
-	}, [setPlayers, setState]);
-
+		return () => {
+			socket.removeEvents("gameStart", "left", "join");
+		}
+	}, [setPlayers, setState, setGame, setTest]);
 
 	if (game) {
 		return <Game players={activePlayers} unload={() => setGame(true)}/>
 	}
 
+	function setupGame() {
+		socket.emit('setupGame');
+	}
+
+
     return (<div className={"block"}>
-	    <p>{test}</p>
+		<button onClick={() => socket.emit('test')}>test button</button>
         <p>Room Code: {roomCode}</p>
 
-        {Object.values(activePlayers).map(playerName => <p>{playerName}</p>)}
-	    <button onClick={() => setGame(true)}>Start Game</button>
+        {Object.values(activePlayers).map(playerName => <p key={crypto.randomUUID()}>{playerName}</p>)}
+	    <button onClick={setupGame}>Start Game</button>
     </div>);
 });
 

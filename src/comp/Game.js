@@ -3,58 +3,98 @@ import Chat from "./Chat";
 import {socket} from "../intitateConnection";
 import style from "./Game.module.css";
 
-
-
 const Game = memo(({players, unload}) => {
-    const [isPrompt, prompt] = useState(false);
+    const [vote, setVote] = useState(null);
     const [plObj, setPlObj] = useState({});
+    const [isPrompt, prompt] = useState(false);
     useEffect(() => {
+        Object.keys(players).forEach((id) => {
+            setPlObj(obj => {
+                obj[id] = {
+                    name: players[id],
+                    vote: null
+                };
+                return {...obj};
+            })
+        });
         socket.on('prompt', () => {
+            console.log("get prompt")
             prompt(true);
         })
         socket.on('vote', (id, vote) => {
             setPlObj(obj => {
                 obj[id].vote = vote;
-                return obj;
-            })
-        })
+                return {...obj};
+            });
+        });
         socket.on('gameEnd', unload);
+        setTimeout(() => {socket.emit('gameStart')}, 1000);
 
-        let obj = {}
-        Object.keys(players).forEach((id) => {
-            obj[id] = {
-                name: players[id],
-                vote: null
-            }
-        })
-        setPlObj(obj);
-    }, [prompt, players, unload]);
+        return () => {
+            socket.removeEvents("prompt", "vote", "gameEnd");
+        }
+    }, [prompt, players, unload, setPlObj]);
 
     return (isPrompt ? <Prompt set={prompt}/> : (
         <div style={{
                 display: "flex"
             }}>
-                <div className={style.gameWrapper + " block"}>
-                    <div>
-                        <Timer/>
-                        {/*<button onClick={() => {
-                            prompt(true);
-                        }}>revealPrompt</button>*/}
-                        <Chat players={players}/>
-                    </div>
+            <div className={"block"} style={{
+                position: "absolute",
+                right: "70vw",
+                top: "20vh"
+            }}>
+                <Voter vote={vote} setVote={setVote} />
+            </div>
+            <div className={style.gameWrapper + " block"}>
+                <div>
+                    <ActivePrompt vote={vote}/>
+                    <Timer/>
+                    {/*<button onClick={() => {
+                        prompt(true);
+                    }}>revealPrompt</button>*/}
+                    <Chat players={plObj}/>
                 </div>
+            </div>
             <div className={"block"} style={{
                 position: "absolute",
                 left: "70vw",
                 top: "20vh"
             }}>
-                <Leaderboard plObj={plObj}/>
+                <Leaderboard players={plObj}/>
             </div>
         </div>
             )
 
     )
 });
+
+
+function Voter({vote, setVote}) {
+    function voting(num) {
+        setVote(num);
+        socket.emit("vote", num)
+    }
+
+    return (
+        <>
+            <button onClick={() => voting(1)} className={style.vote + " " + style.red + " " + (vote != null ? (vote === 1 ? style.selected : "") : "")}>
+            </button>
+            <button onClick={() => voting(2)} className={style.vote + " " + style.blue + " " + (vote != null ? (vote === 2 ? style.selected : "") : "")}>
+            </button>
+        </>
+    )
+}
+
+function ActivePrompt ({vote}) {
+    return (
+        <div>
+            <span style={{color: "red", textDecoration: (vote === 1 ? "underline" : "none")}}>TEST</span><br/>
+            vs<br/>
+            <span style={{color: "blue", textDecoration: (vote === 2 ? "underline" : "none")}}>TEST</span>
+        </div>
+    )
+}
 
 
 
@@ -98,11 +138,38 @@ function Timer() {
     }}>{time}</div>;
 }
 
-function Leaderboard({plObj}) {
-    return Object.values(plObj).map(pl => <div style={{
+function Leaderboard({players}) {
+    const [red, setRed] = useState([]);
+    const [blue, setBlue] = useState([]);
+    useEffect(() => {
+        socket.on('vote', (id, vote) => {
+            if (id in red)
+                setRed(arr => {
+                    return arr.filter(a => a != id)
+                });
+            else if (id in blue)
+                setBlue(arr => {
+                    return arr.filter(a => a != id)
+                });
+
+            if (vote === 1)
+                setRed(arr => {
+                    arr.push(id);
+                    return arr;
+                })
+            else if (vote === 2)
+                setBlue(arr => {
+                    arr.push(id);
+                    return arr;
+                })
+        })
+    }, [setRed, setBlue, red, blue])
+
+
+    return Object.values(players).map(pl => <div style={{
         padding: "2px",
         fontSize: "15px",
-        color: pl.vote != null ? (pl.vote == 1 ? "red" : "blue") : "black"
+        color: pl.vote != null ? (pl.vote === 1 ? "red" : "blue") : "black"
     }}>{pl.name}</div>)
 }
 

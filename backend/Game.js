@@ -5,77 +5,70 @@ function openChat() {
 }
 
 export default class Game {
-    gamePlayers = {};
-    playerPrompts
 
     constructor(lobby) {
         this.lobby = lobby;
-        this.lobby.playerList.forEach(p => p.on('chat', (msg) => {
-            this.lobby.playerList.forEach(p2 => p2.emit('chat', msg));
-        }))
-        this.gameLoop();
-    }
-
-
-    join(player) {
-        player.on('chat', (msg) => {
-            this.lobby.playerList.forEach(p => p !== player ? p.emit('chat', msg, this.gamePlayers[player.id].name) : false);
-        })
-
-        this.gamePlayers[player.id] = player;
+        this.onAllPlayer('chat', (p, msg) => p.emit('chat', msg));
+        console.log(this);
+        console.log("Game created by lobby " + this.lobby.roomCode);
     }
 
 
     async promptForPrompt() {
-        const pIDs =[];
-        const pPrompts = [];
-        return (await new Promise((resolve) => {
-            this.lobby.playerList.forEach(p => p.emit("prompt"));
-            this.lobby.playerList.forEach(p => p.on("prompt", (prompt) => {
-                pIDs.push(p.id);
-                pPrompts.push(prompt);
-
-                if (pIDs.length >= this.lobby.playerList.length) {
-                    resolve(pIDs.reduce((accumulator, id, index) => {
-                        return {...accumulator, [id]: pPrompts[index]};
-                    }, {}));
-                }
-            }))
-        }));
+        let count = 1;
+        await new Promise((resolve) => {
+            this.emitAllPlayer("prompt");
+            console.log("emit prompt");
+            this.onAllPlayer("editPrompt", () => {
+                count--;
+            });
+            this.onAllPlayer("prompt", (p, prompt) => {
+                p.prompt = prompt;
+                count++;
+                if (count === this.lobby.playerList.length)
+                    resolve();
+            });
+            this.lobby.host.on('breakPrompts', () => {
+                resolve();
+            });
+        });
     }
 
 
     async promptForVotes(idOrder) {
+
         let count = 1;
         let result = await new Promise((resolve) => {
             const result  ={};
-            this.lobby.playerList.forEach(p => p.emit("startVote"));
-            this.lobby.playerList.forEach(p => p.on("vote", (v) => {
+            this.emitAllPlayer("startVote");
+            this.onAllPlayer("vote", (p, v) => {
                 if (v !== 1 && v !== 2)
                     return;
-                this.lobby.playerList.forEach(p => p.emit("vote"));
                 let index = idOrder.indexOf(p.id);
+                if (index === -1)
+                    return;
+                this.emitAllPlayer("vote", p.id, v);
                 result[index] = v;
                 if (count === idOrder.length)
                     resolve(result);
                 count++;
-            }))
+            });
+            this.lobby.host.on('breakRound', () => {
+                resolve(result);
+            })
         })
+        this.lobby.host.socket.removeListener('breakRound');
+        this.removeAllEvents("vote");
         return Object.values(result); //array of player ids by voted
-    }
-
-
-    get playerList () {
-        return Object.values(this.gamePlayers);
     }
 
     async gameLoop(){
         // Prompt every individual in the collection of players for their "answer"
-
         // Shuffle the players so they are in a random order
         let playerList = this.lobby.playerList.randomize();
         let idList = playerList.map(p => p.id);
 
+        await this.promptForPrompt();
         let tempWinner = playerList[0];
         for (let i = 1; i < playerList.length; i++) { //this loop intentionally runs one shorter
                                                                             //than typical!!
@@ -83,7 +76,6 @@ export default class Game {
             let redLeader = playerList[i];
             let blueVoters = [blueLeader];
             let redVoters = [redLeader];
-            openChat(); //<- doesn't exist, but basically this is when we want players to be able to start discussing
             this.lobby.startTimer(3);
             let votesByIndex = await this.promptForVotes(idList);
             for (let i = 0; i<votesByIndex.length; i++) {
@@ -120,16 +112,36 @@ export default class Game {
             } //theres more for both of those above handles, but this is the framework for a game
 
             // eslint-disable-next-line no-loop-func
-            this.lobby.playerList.forEach(p => p.emit('roundEnd', tempWinner.id));
+            this.emitAllPlayer('roundEnd', tempWinner.id);
             //theres more for both of those above handles, but this is the framework for a game
         }
-        this.lobby.playerList.forEach(p => p.emit('gameEnd', tempWinner.id, this.lobby.host.id));
+        this.emitAllPlayer('gameEnd', tempWinner.id, this.lobby.host.id);
         this.lobby.host.on('replay', (bool) => {
             if (bool) {
                 this.gameLoop();
             }
         })
     }
+
+    // f = (p) => return [...args]
+    emitAllPlayer(msg, ...f) {
+        if (f[0] instanceof Function)
+            this.lobby.playerList.forEach(p => p.emit(msg, ...f[0](p)));
+        else
+            this.lobby.playerList.forEach(p => p.emit(msg, ...f));
+    }
+
+    // f = (player, ...args)
+    onAllPlayer(msg, f) {
+        this.lobby.playerList.forEach(p => p.on(msg, (...args) => f(p, ...args)));
+    }
+
+    removeAllEvents(...ev) {
+        ev.forEach(e => {
+            this.lobby.playerList.forEach(p => p.socket.removeListener(e));
+        })
+    }
+
 }
 
 
