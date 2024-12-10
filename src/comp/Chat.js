@@ -37,7 +37,7 @@ let CurrentChat = function ({players, setMsg}) {
                         padding: "4px",
                         overflowWrap: "break-word"
                     }}> <span style={{
-                        color: pl.vote != null ? (pl.vote === 1 ? "red" : "blue") : "black"
+                        color: pl.vote != null ? (pl.vote === 2 ? "red" : "blue") : "black"
                     }}>[{id === clientID ? "You" : pl.name}]</span>&nbsp;&nbsp;{msg}</div>);
                     return [...arr];
                 });

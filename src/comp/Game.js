@@ -28,6 +28,9 @@ const Game = memo(({players, unload}) => {
                 return {...obj};
             });
         });
+        socket.on('roundEnd', () => {
+            setVote(null);
+        })
         socket.on('gameEnd', unload);
         setTimeout(() => {socket.emit('gameStart')}, 1000);
 
@@ -76,14 +79,14 @@ const Game = memo(({players, unload}) => {
 function Voter({vote, setVote}) {
     function voting(num) {
         setVote(num);
-        socket.emit("vote", num)
+        socket.emit("vote", num);
     }
 
     return (
         <>
-            <button onClick={() => voting(1)} className={style.vote + " " + style.red + " " + (vote != null ? (vote === 1 ? style.selected : "") : "")}>
+            <button onClick={() => voting(2)} className={style.vote + " " + style.red + " " + (vote != null ? (vote === 2 ? style.selected : "") : "")}>
             </button>
-            <button onClick={() => voting(2)} className={style.vote + " " + style.blue + " " + (vote != null ? (vote === 2 ? style.selected : "") : "")}>
+            <button onClick={() => voting(1)} className={style.vote + " " + style.blue + " " + (vote != null ? (vote === 1 ? style.selected : "") : "")}>
             </button>
         </>
     )
@@ -93,19 +96,19 @@ function ActivePrompt ({vote}) {
     const [red, setRed] = useState("Undefined");
     const [blue, setBlue] = useState("Undefined");
     useEffect(() => {
-        socket.on('round', (redPrompt, bluePrompt) => {
+        socket.on('round', (bluePrompt, redPrompt) => {
             setRed(redPrompt);
             setBlue(bluePrompt);
         });
 
         return () => socket.removeEvents('round');
-    }, []);
+    }, [setBlue, setRed]);
 
     return (
         <div>
-            <span style={{color: "red", textDecoration: (vote === 1 ? "underline" : "none")}}>{red}</span><br/>
+            <span style={{color: "red", textDecoration: (vote === 2 ? "underline" : "none")}}>{red.toUpperCase()}</span><br/>
             vs<br/>
-            <span style={{color: "blue", textDecoration: (vote === 2 ? "underline" : "none")}}>{blue}</span>
+            <span style={{color: "blue", textDecoration: (vote === 1 ? "underline" : "none")}}>{blue.toUpperCase()}</span>
         </div>
     )
 }
@@ -166,12 +169,12 @@ function Leaderboard({players}) {
                     return arr.filter(a => a !== id)
                 });
 
-            if (vote === 1)
+            if (vote === 2)
                 setRed(arr => {
                     arr.push(id);
                     return arr;
                 })
-            else if (vote === 2)
+            else if (vote === 1)
                 setBlue(arr => {
                     arr.push(id);
                     return arr;
@@ -183,7 +186,7 @@ function Leaderboard({players}) {
     return Object.values(players).map(pl => <div style={{
         padding: "2px",
         fontSize: "15px",
-        color: pl.vote != null ? (pl.vote === 1 ? "red" : "blue") : "black"
+        color: pl.vote != null ? (pl.vote === 2 ? "red" : "blue") : "black"
     }}>{pl.name}</div>)
 }
 

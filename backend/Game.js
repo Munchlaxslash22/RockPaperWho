@@ -63,40 +63,48 @@ export default class Game {
     }
 
 
-    async promptForVotes(idOrder, endTimer) {
-        let count = 1;
-
-        let result = await new Promise((resolve) => {
-            const result  ={};
+    async promptForVotes(players, endTimer) {
+        let [blue, red] = await new Promise((resolve) => {
+            let bArr = [];
+            let rArr = [];
             this.emitAllPlayer("startVote");
             this.onAllPlayer("vote", (p, v) => {
                 if (v !== 1 && v !== 2)
                     return;
-                let index = idOrder.indexOf(p.id);
-                if (index === -1)
-                    return;
+                console.log(`${p.name} voted for ${v === 1 ? "blue" : "red"}`);
                 this.emitAllPlayer("vote", p.id, v);
-                result[index] = v;
-                if (count === idOrder.length) {
-                    endTimer();
-                    resolve(result);
+                if (v === 1) {
+                    if (p in bArr)
+                        return;
+                    bArr.push(p);
+                    if (p in rArr)
+                        rArr.filter(pl => !(pl in bArr));
+                } else if (v === 2) {
+                    if (p in rArr)
+                        return;
+                    rArr.push(p);
+                    if (p in rArr)
+                        bArr.filter(pl => !(pl in rArr));
                 }
-                count++;
+
+                if (bArr.concat(rArr).every(pl => pl in players)) {
+                    endTimer();
+                    resolve([bArr, rArr]);
+                }
             });
             this.lobby.host.on('breakRound', () => {
                 endTimer();
-                resolve(result);
+                resolve([bArr, rArr]);
             })
         })
         this.removeAllEvents("vote", "breakRound");
-        return Object.values(result); //array of player ids by voted
+        return [blue, red]; //array of player ids by voted
     }
 
     async gameLoop(){
         // Prompt every individual in the collection of players for their "answer"
         // Shuffle the players so they are in a random order
         let playerList = this.lobby.playerList.randomize();
-        let idList = playerList.map(p => p.id);
 
         this.onAllPlayer('chat', (p, msg) => this.emitAllPlayer('chat', msg, p.id));
         await this.promptForPrompt();
@@ -105,31 +113,19 @@ export default class Game {
                                                                             //than typical!!
             let blueLeader = tempWinner;
             let redLeader = playerList[i];
-            let blueVoters = [blueLeader];
-            let redVoters = [redLeader];
-            this.emitAllPlayer('round', redLeader.prompt, blueLeader.prompt);
+            let blueVoters = [];
+            let redVoters = [];
+            this.emitAllPlayer('round', blueLeader.prompt, redLeader.prompt);
             let endTimer = this.lobby.startTimer(3);
-            let votesByIndex = await this.promptForVotes(idList, endTimer);
-            for (let i = 0; i<votesByIndex.length; i++) {
-                if (votesByIndex[i] === 1)
-                    blueVoters.push(playerList[i]);
-                else if (votesByIndex[i] === 2)
-                    redVoters.push(playerList[i]);
-            }
+            [blueVoters, redVoters] = await this.promptForVotes(playerList, endTimer);
             if (blueVoters.length === redVoters.length) {
                 // tie breaker round!
-                blueVoters = [blueLeader];
-                redVoters = [redLeader];
+                blueVoters = [];
+                redVoters = [];
                 // let everyone know this is a tie breaker!
                 this.emitAllPlayer('tie');
                 let tieTimer = this.lobby.startTimer(1);
-                votesByIndex = await this.promptForVotes(idList, tieTimer);
-                for (let i = 0; i<votesByIndex.length; i++) {
-                    if (votesByIndex[i] === 1)
-                        blueVoters.push(playerList[i]);
-                    else if (votesByIndex[i] === 2)
-                        redVoters.push(playerList[i]);
-                }
+                [blueVoters, redVoters] = await this.promptForVotes(playerList, tieTimer);
                 // if it's a tie again, then we pick randomly
                 if (blueVoters.length === redVoters.length) {
                     if (Math.floor(Math.random() * 2) === 1) {
