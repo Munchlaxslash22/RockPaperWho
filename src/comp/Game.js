@@ -3,10 +3,14 @@ import Chat from "./Chat";
 import {socket} from "../intitateConnection";
 import style from "./Game.module.css";
 
+let prompts = [];
+
 const Game = memo(({players, unload}) => {
     const [vote, setVote] = useState(null);
     const [plObj, setPlObj] = useState({});
     const [isPrompt, prompt] = useState(false);
+    const [red, setRed] = useState("");
+    const [blue, setBlue] = useState("");
     useEffect(() => {
         Object.keys(players).forEach((id) => {
             setPlObj(obj => {
@@ -31,13 +35,31 @@ const Game = memo(({players, unload}) => {
         socket.on('roundEnd', () => {
             setVote(null);
         })
-        socket.on('gameEnd', unload);
+        socket.on('gameEnd', (id, hostID, prompt, lostPrompt) => {
+            if(!prompts.includes(lostPrompt))
+                prompts.push(lostPrompt);
+            unload(id, hostID, prompt, prompts.filter(p => p !== prompt));
+        });
         setTimeout(() => {socket.emit('gameStart')}, 1000);
 
+        socket.on('round', (bluePrompt, redPrompt) => {
+            setRed(prev => {
+                if (!prompts.includes(prev) && prev !== "")
+                    prompts.push(prev);
+                return redPrompt;
+            });
+            setBlue(prev => {
+                if (!prompts.includes(prev) && prev !== "")
+                    prompts.push(prev);
+                return bluePrompt;
+            });
+        });
+
+
         return () => {
-            socket.removeEvents("prompt", "vote", "gameEnd");
+            socket.removeEvents("prompt","round", "vote", "gameEnd");
         }
-    }, [prompt, players, unload, setPlObj]);
+    }, [prompt, players, unload, setPlObj, setRed, setBlue]);
 
     return (isPrompt ? <Prompt set={prompt}/> : (
         <div style={{
@@ -52,7 +74,7 @@ const Game = memo(({players, unload}) => {
             </div>
             <div className={style.gameWrapper + " block"}>
                 <div>
-                    <ActivePrompt vote={vote}/>
+                    <ActivePrompt red={red} blue={blue} vote={vote}/>
                     <Timer/>
                     <button onClick={() => socket.emit('breakPrompts')}>BREAK PROMPTS</button>
                     <button onClick={() => socket.emit('breakRound')}>BREAK ROUND</button>
@@ -76,6 +98,8 @@ const Game = memo(({players, unload}) => {
 });
 
 
+
+
 function Voter({vote, setVote}) {
     function voting(num) {
         setVote(num);
@@ -84,25 +108,15 @@ function Voter({vote, setVote}) {
 
     return (
         <>
-            <button onClick={() => voting(2)} className={style.vote + " " + style.red + " " + (vote != null ? (vote === 2 ? style.selected : "") : "")}>
+            <button disabled={vote === 2}  onClick={() => voting(2)} className={style.vote + " " + style.red + " " + (vote != null ? (vote === 2 ? style.selected : "") : "")}>
             </button>
-            <button onClick={() => voting(1)} className={style.vote + " " + style.blue + " " + (vote != null ? (vote === 1 ? style.selected : "") : "")}>
+            <button disabled={vote === 1} onClick={() => voting(1)} className={style.vote + " " + style.blue + " " + (vote != null ? (vote === 1 ? style.selected : "") : "")}>
             </button>
         </>
     )
 }
 
-function ActivePrompt ({vote}) {
-    const [red, setRed] = useState("Undefined");
-    const [blue, setBlue] = useState("Undefined");
-    useEffect(() => {
-        socket.on('round', (bluePrompt, redPrompt) => {
-            setRed(redPrompt);
-            setBlue(bluePrompt);
-        });
-
-        return () => socket.removeEvents('round');
-    }, [setBlue, setRed]);
+function ActivePrompt ({vote, red, blue}) {
 
     return (
         <div>
@@ -146,8 +160,10 @@ function Timer() {
     useEffect(() => {
         socket.on('time', (minute, second) => {
             setTime(`${minute}:${second}`);
+            if (minute === "0" && second === "00")
+                socket.emit("timerOut");
         })
-    }, []);
+    }, [setTime]);
 
     return <div style={{
         height: "50px",

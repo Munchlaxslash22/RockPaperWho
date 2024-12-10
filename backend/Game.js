@@ -19,11 +19,6 @@ Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
 }
 
-function openChat() {
-    //Doesn't do anything yet, but meant to open up the chat menu so that players can speak with eachother
-
-}
-
 let randomPrompts = fs.readFileSync('./backend/randomAnswers.txt', {encoding: "utf-8"}).split('\n').randomize();
 
 export default class Game {
@@ -36,28 +31,32 @@ export default class Game {
 
 
 
+    openChat() {
+        this.onAllPlayer('chat', (p, msg) => this.emitAllPlayer('chat', msg, p.id));
+        return () => this.removeAllEvents('chat');
+    }
+
     async promptForPrompt() {
-        let count = 1;
         await new Promise((resolve) => {
-            this.emitAllPlayer("prompt");
-            console.log("emit prompt");
-            this.onAllPlayer("editPrompt", () => {
-                count--;
-            });
-            this.onAllPlayer("prompt", (p, prompt) => {
-                p.prompt = prompt;
-                count++;
-                if (count === this.lobby.playerList.length)
-                    resolve();
-            });
-            this.lobby.host.on('breakPrompts', () => {
+            const breakPrompts = () => {
                 this.lobby.playerList.forEach(p => {
                     if (!p.prompt) {
                         p.prompt = randomPrompts.random();
-                    }
-                })
-                resolve();
+                    }});
+                clearTimeout(x);
+                resolve()
+            };
+            let x = setTimeout(breakPrompts, 60000);
+
+            this.emitAllPlayer("prompt");
+            console.log("emit prompt");
+            this.onAllPlayer("prompt", (p, prompt) => {
+                p.prompt = prompt;
+                if (this.lobby.playerList.every(p => !!p.prompt))
+                    clearTimeout(x);
+                    resolve();
             });
+                this.lobby.host.on('breakPrompts', breakPrompts)
         });
         this.removeAllEvents("prompt", "breakPrompts","editPrompt")
     }
@@ -69,25 +68,26 @@ export default class Game {
             let rArr = [];
             this.emitAllPlayer("startVote");
             this.onAllPlayer("vote", (p, v) => {
+                console.log(bArr.includes(p));
                 if (v !== 1 && v !== 2)
                     return;
                 console.log(`${p.name} voted for ${v === 1 ? "blue" : "red"}`);
                 this.emitAllPlayer("vote", p.id, v);
                 if (v === 1) {
-                    if (p in bArr)
-                        return;
-                    bArr.push(p);
-                    if (p in rArr)
-                        rArr.filter(pl => !(pl in bArr));
+                    if (!bArr.includes(p)) {
+                        bArr.push(p);
+                        if (rArr.includes(p))
+                            rArr = rArr.filter(pl => p !== pl);
+                    }
                 } else if (v === 2) {
-                    if (p in rArr)
-                        return;
-                    rArr.push(p);
-                    if (p in rArr)
-                        bArr.filter(pl => !(pl in rArr));
+                    if (!rArr.includes(p)) {
+                        rArr.push(p);
+                        if (bArr.includes(p))
+                            bArr = bArr.filter(pl => p != pl);
+                    }
                 }
 
-                if (bArr.concat(rArr).every(pl => pl in players)) {
+                if (players.every(p => (rArr.includes(p)) || (bArr.includes(p)))) {
                     endTimer();
                     resolve([bArr, rArr]);
                 }
@@ -96,8 +96,11 @@ export default class Game {
                 endTimer();
                 resolve([bArr, rArr]);
             })
+            this.lobby.host.on('timerOut', () => {
+                resolve([bArr, rArr]);
+            })
         })
-        this.removeAllEvents("vote", "breakRound");
+        this.removeAllEvents("vote","timerOut", "breakRound");
         return [blue, red]; //array of player ids by voted
     }
 
@@ -106,9 +109,10 @@ export default class Game {
         // Shuffle the players so they are in a random order
         let playerList = this.lobby.playerList.randomize();
 
-        this.onAllPlayer('chat', (p, msg) => this.emitAllPlayer('chat', msg, p.id));
         await this.promptForPrompt();
+        const closeChat = this.openChat();
         let tempWinner = playerList[0];
+        let losingPrompt = "";
         for (let i = 1; i < playerList.length; i++) { //this loop intentionally runs one shorter
                                                                             //than typical!!
             let blueLeader = tempWinner;
@@ -118,6 +122,8 @@ export default class Game {
             this.emitAllPlayer('round', blueLeader.prompt, redLeader.prompt);
             let endTimer = this.lobby.startTimer(3);
             [blueVoters, redVoters] = await this.promptForVotes(playerList, endTimer);
+            console.log("Voted blue: " + blueVoters.map(p => p.name).toString(), "Voted red: " +redVoters.map(p => p.name).toString());
+            console.log("Tie breaker? " + (blueVoters.length === redVoters.length));
             if (blueVoters.length === redVoters.length) {
                 // tie breaker round!
                 blueVoters = [];
@@ -131,21 +137,26 @@ export default class Game {
                     if (Math.floor(Math.random() * 2) === 1) {
                         //handling red team winning
                         tempWinner = redLeader;
-
+                        losingPrompt = blueLeader.prompt;
+                    } else
+                        losingPrompt = redLeader.prompt;
                 }
             }
             if (redVoters.length > blueVoters.length) {
                 //handling red team winning
                 tempWinner = redLeader;
-            }
-
-            } //theres more for both of those above handles, but this is the framework for a game
+                losingPrompt = blueLeader.prompt;
+            } else
+                losingPrompt = redLeader.prompt;
+            //theres more for both of those above handles, but this is the framework for a game
 
             // eslint-disable-next-line no-loop-func
             this.emitAllPlayer('roundEnd', tempWinner.id);
+            this.emitAllPlayer('resetChat');
             //theres more for both of those above handles, but this is the framework for a game
         }
-        this.emitAllPlayer('gameEnd', tempWinner.id, this.lobby.host.id);
+        closeChat();
+        this.emitAllPlayer('gameEnd', tempWinner.id, this.lobby.host.id, tempWinner.prompt, losingPrompt);
         this.lobby.host.on('replay', (bool) => {
             if (bool) {
                 this.gameLoop();

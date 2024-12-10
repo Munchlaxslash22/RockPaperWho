@@ -29,7 +29,8 @@ export default class Lobby {
     playerJoin(player) {
         if (this.playerList.length < 8) {
             this.playerList.push(player);
-			  this.playerList.forEach(p => p.emit("join", player.id, player.name));
+            player.joinLobby(this);
+        this.playerList.forEach(p => p.emit("join", player.id, player.name));
         return true;
         }
         return false;
@@ -38,6 +39,7 @@ export default class Lobby {
 
 	playerLeaves(playerId)
 	{
+    this.playerList.forEach(p => p.emit("left", playerId));
 		let listWithOut = this.playerList.map(p => p.id).filter(id => id !== playerId).map(id => this.playerList[id]);
 		this.playerList = listWithOut;
 	}
@@ -46,7 +48,7 @@ export default class Lobby {
     playerDisconnects(playerId) {
         for (const p of this.playerList) {
             if (playerId === p.id) {
-                this.inactivePlayers.push(playerId)
+                this.inactivePlayers.push(p);
                 return;
             }
         }
@@ -56,7 +58,6 @@ export default class Lobby {
     kickPlayer(playerId) {
         if (playerId in this.playerList.map(p => p.id)) {
             this.playerLeaves(playerId);
-            this.playerList.forEach(p => p.emit("left", playerId));
             return true;
         }
         return false;
@@ -127,8 +128,10 @@ export default class Lobby {
         seconds = seconds < 10 ? "0" + seconds : seconds.toString();
 
         this.playerList.forEach(p => {
-            p.emit("time", minutes, seconds);
+            if ( !(p in this.inactivePlayers) )
+                p.emit("time", minutes, seconds);
         })
+
         // countdownElement.innerHTML = `${minutes}: ${seconds}`;
     }
 

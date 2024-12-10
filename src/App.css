@@ -49,12 +49,29 @@
   margin: 20px;
   box-sizing: border-box;
   background-color: whitesmoke;
-  clip-path: xywh(0px 0px 100% 100% round 20px 20px);
   border-width: 0 10px 10px 0;
+  clip-path: xywh(0px 0px 100% 100% round 20px 20px);
   border-color: lightgray;
   border-style: solid;
 }
 
+button {
+ box-sizing: border-box;
+ width: auto;
+ padding: 5px;
+ background-color : white;
+ border: none;
+ font-size: 20px;
+ clip-path: xywh(0px 0px 100% 100% round 10px 10px);
+ border-color: lightgray;
+ border-width: 0 5px 5px 0;
+ border-style: solid;
+ &:active {
+  background-color: gray;
+  border-width: 5px 0 0 5px;
+  border-color: darkgray;
+ }
+}
 
 .inline {
   color: black;

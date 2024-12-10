@@ -2,17 +2,6 @@ import {useEffect, useRef, useState} from "react";
 import {clientID, socket} from "../intitateConnection";
 import style from "./Game.module.css";
 
-function doOnce (thing) {
-let bool = false;
-
-    return function () {
-        if (!bool) {
-            bool = true;
-            return this
-        }
-    }.bind(thing);
-
-}
 
 const AlwaysScrollToBottom = () => {
     const elementRef = useRef();
@@ -21,37 +10,36 @@ const AlwaysScrollToBottom = () => {
 };
 
 
-let i = 0;
 let CurrentChat = function ({players, setMsg}) {
     const [chatMessages, setChatMessages] = useState([]);
+    const [count, setCount] = useState(0);
     useEffect(() => {
         socket.on('chat', (msg, id) => {
-            console.log(players);
+            console.log(msg);
             let pl = players[id];
             if (pl) {
                 setChatMessages(arr => {
-                    arr.push(<div key={i} style={{
-                        backgroundColor: i % 2 === 0 ? "white" : "#f5f5f5",
+                    return [...arr, <div key={count} style={{
+                        backgroundColor: count % 2 === 0 ? "white" : "#f5f5f5",
                         textAlign: "start",
                         fontSize: "16px",
                         padding: "4px",
                         overflowWrap: "break-word"
                     }}> <span style={{
                         color: pl.vote != null ? (pl.vote === 2 ? "red" : "blue") : "black"
-                    }}>[{id === clientID ? "You" : pl.name}]</span>&nbsp;&nbsp;{msg}</div>);
-                    return [...arr];
+                    }}>[{id === clientID ? "You" : pl.name}]</span>&nbsp;&nbsp;{msg}</div>];
                 });
-                i++;
+                setCount(prev => prev + 1)
             }
         });
-        socket.on('resetChat', () => {
+        socket.on("resetChat", () => {
             setChatMessages([]);
             setMsg('');
         })
         return () => {
             socket.removeEvents("chat", "resetChat");
         }
-    }, [players, setMsg, setChatMessages]);
+    }, [players, setMsg, setChatMessages, count, setCount]);
 
     return (<div className={style.chat}>
         <>

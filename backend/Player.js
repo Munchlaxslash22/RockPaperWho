@@ -5,7 +5,7 @@ export default class Player {
         this.id = id;
         this.prompt = "";
         this.isReady = false;
-		this.lobby = null;
+        this.lobby = null;
         this.socket = null;
     }
 

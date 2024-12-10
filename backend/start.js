@@ -52,6 +52,7 @@ io.on('connection', (socket) => {
 			state: true,
 			names: [pl.name],
 			ids: [id],
+        isHost: true,
 			roomCode: lobby.roomCode		});
 		console.log(`User ${name}, initiated lobby: ${lobby.roomCode}`);
         });
@@ -65,6 +66,7 @@ io.on('connection', (socket) => {
                     state: true,
                     names: lobby.playerList.map(p => p.name),
                     ids: lobby.playerList.map(p => p.id),
+                    isHost: false,
                     roomCode: roomCode
                 });
             } else {

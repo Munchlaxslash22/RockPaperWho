@@ -60,14 +60,6 @@ function App() {
       <div className="background1">
           <div className="background2">
               <div className="App-header">
-                  <div>
-                      <button onClick={() => setState("login")}>Login</button>
-                      <button onClick={() => setState("chat")}>Chat</button>
-                      <button onClick={() => {
-                          socket.emit("startLobby", "test");
-                      }}>Lobby</button>
-                      <button onClick={() => setState("game")}>Game</button>
-                  </div>
                   <Current state={state} setState={setState}/>
               </div>
               </div>
@@ -81,6 +73,7 @@ function openLobby(lobby){
 		players[id] = lobby.names[index];
 	});
 	currentProps.players = players;
+    currentProps.isHost = lobby.isHost;
 	currentProps.roomCode = lobby.roomCode;
 }
 
@@ -95,7 +88,7 @@ function Login() {
 
     function join() {
         let name = nameRef.current.value;
-        let roomCode = idRef.current.value;
+        let roomCode = idRef.current.value.toLowerCase();
         if (name && roomCode) {
 		console.log("connecting");
             socket.emit("joinLobby", roomCode, name);
