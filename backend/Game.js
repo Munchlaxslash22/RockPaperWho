@@ -40,7 +40,7 @@ export default class Game {
         await new Promise((resolve) => {
             const breakPrompts = () => {
                 this.lobby.playerList.forEach(p => {
-                    if (!p.prompt) {
+                    if (!p.prompt || p.prompt === "") {
                         p.prompt = randomPrompts.random();
                     }});
                 clearTimeout(x);
@@ -53,12 +53,11 @@ export default class Game {
             this.onAllPlayer("prompt", (p, prompt) => {
                 p.prompt = prompt;
                 if (this.lobby.playerList.every(p => !!p.prompt))
-                    clearTimeout(x);
-                    resolve();
+                    breakPrompts();
             });
                 this.lobby.host.on('breakPrompts', breakPrompts)
         });
-        this.removeAllEvents("prompt", "breakPrompts","editPrompt")
+        this.removeAllEvents("prompt", "breakPrompts")
     }
 
 

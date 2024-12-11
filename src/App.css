@@ -73,6 +73,18 @@ button {
  }
 }
 
+input[type=text] {
+    box-sizing: border-box;
+    background-color: whitesmoke;
+    clip-path: xywh(0px 0px 100% 100% round 5px 5px);
+    border-width: 7px 0 0 7px;
+    border-color: #e5e5e5;
+    border-style: solid;
+    outline: none;
+    vertical-align: top;
+    height: calc(292px * 0.1);
+}
+
 .inline {
   color: black;
   border-radius: 50px;

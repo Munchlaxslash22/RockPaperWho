@@ -101,6 +101,12 @@ const Game = memo(({players, unload}) => {
 
 
 function Voter({vote, setVote}) {
+    useEffect(() => {
+        socket.on("tie", () => {
+            setVote(null);
+        })
+    }, [setVote]);
+
     function voting(num) {
         setVote(num);
         socket.emit("vote", num);

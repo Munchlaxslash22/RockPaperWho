@@ -108,7 +108,8 @@ function Win ({winningPrompt, restart, winnerName, hostID, losingPrompts}) {
             <div>The winner is {winnerName}</div>
             <p style={{
 								textAlign: "center",
-								fontSize: 50
+								fontSize: 50,
+								wordBreak: "break-all"
 							}}>{winningPrompt.toUpperCase()}</p>
         </div>
 				</div>

@@ -4,6 +4,7 @@ import {socket, clientID} from "./intitateConnection";
 import Lobby from "./comp/Lobby";
 import Chat from "./comp/Chat";
 import Game from "./comp/Game";
+import logoIMG from "./.resources/rockpaper.png";
 
 
 
@@ -104,17 +105,24 @@ function Login() {
 
 
 
-    return (<div className={"block"}>
+    return (<>
+
+        <img src={logoIMG} alt="Rock Paper Who" style={{
+            width: "50vw",
+            clipPath: "inset(20% 10% 25% 10% round 5% 5% 5% 5%)"
+        }}/>
+
+        <div className={"block"}>
         <form onSubmit={(e) => e.preventDefault()}>
             <label aria-label={"name"} htmlFor={"name"}>name</label>:&nbsp;
-            <input ref={nameRef} name={"name"} form={"text"}/>&nbsp;&nbsp;
+            <input type="text" ref={nameRef} name={"name"} form={"text"}/>&nbsp;&nbsp;
             <label aria-label={"room id"} htmlFor={"roomId"}>room id</label>:&nbsp;
-            <input ref={idRef} name={"roomID"} form={"text"}/>
+            <input type="text" ref={idRef} name={"roomID"} form={"text"}/>
             <br />
             <button onClick={join}>Join</button> <button onClick={openLobby}>Create</button>
         </form>
         <p>{process.env.REACT_APP_SERVER_URL}</p>
-        </div>)
+    </div></>)
 }
 
 
