@@ -76,8 +76,6 @@ const Game = memo(({players, unload}) => {
                 <div>
                     <ActivePrompt red={red} blue={blue} vote={vote}/>
                     <Timer/>
-                    <button onClick={() => socket.emit('breakPrompts')}>BREAK PROMPTS</button>
-                    <button onClick={() => socket.emit('breakRound')}>BREAK ROUND</button>
                     {/*<button onClick={() => {
                         prompt(true);
                     }}>revealPrompt</button>*/}

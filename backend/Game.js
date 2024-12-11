@@ -158,6 +158,7 @@ export default class Game {
         this.emitAllPlayer('gameEnd', tempWinner.id, this.lobby.host.id, tempWinner.prompt, losingPrompt);
         this.lobby.host.on('replay', (bool) => {
             if (bool) {
+                this.emitAllPlayer('replay');
                 this.gameLoop();
             }
         })

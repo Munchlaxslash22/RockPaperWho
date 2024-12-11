@@ -41,6 +41,7 @@ const Lobby = memo(function({roomCode, players, setState, isHost}){
 		socket.on('game', () => {
 			setGame(true);
 		})
+
 		return () => {
 			socket.removeEvents("gameStart", "left", "join");
 		}
@@ -48,6 +49,7 @@ const Lobby = memo(function({roomCode, players, setState, isHost}){
 
 
 	function restart () {
+		socket.emit('replay');
 		setWin(false);
 		setGame(true);
 	}
@@ -81,7 +83,6 @@ const Lobby = memo(function({roomCode, players, setState, isHost}){
 
 
     return (<div className={"block"}>
-		<button onClick={() => socket.emit('test')}>test button</button>
         <p>Room Code: {roomCode.toUpperCase()}</p>
 
 			{Object.values(activePlayers).map(playerName => <p>{playerName}</p>)}
@@ -97,6 +98,13 @@ const Lobby = memo(function({roomCode, players, setState, isHost}){
 });
 
 function Win ({winningPrompt, restart, winnerName, hostID, losingPrompts}) {
+	useEffect(() => {
+		socket.on('replay',  restart);
+		return () => {
+			socket.removeEvents('replay');
+		}
+	});
+
 
     return (
 			<>

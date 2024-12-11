@@ -33,6 +33,9 @@ export default class Player {
         this.socket = null;
         if (this.lobby){
             this.lobby.playerDisconnects(this.id);
+            if (this.lobby.host === this) {
+                this.lobby.close();
+            }
         }
     }
 
